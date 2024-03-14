@@ -1,13 +1,13 @@
 function love.load()
-    if love.filesystem.getInfo("libs/verify.lua") then
-        require("libs/verify") -- run the verification script
+    if love.filesystem.getInfo("helpers/verify.lua") then
+        require("helpers/verify") -- run the verification script
     else
         print("error: Unable to verify interigrity") -- if the script is not found print the error to the console
         if love.filesystem.getInfo("verification_log.log") then 
-            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/libs/verify.lua") -- write the log
+            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") -- write the log
         else
             love.filesystem.newFile("verification_log.log") -- create the log file if it does not exists
-            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/libs/verify.lua") -- write the log
+            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") -- write the log
         end
         error("We are currently unable to verify interigrity for the safety of your data this program will now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
@@ -30,20 +30,34 @@ function love.load()
     x = 0 -- the x pos of the draw array
     mode = "run" -- current mode of the program
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
-    --[[
-    tmp = love.window.showMessageBox("Credit", "Made by Zalan(Zalnder)", {"Ok", "More info"}, "info") -- message box
-    if tmp == 2 then
-        love.system.openURL(love.filesystem.getSource().."/html/index.html")
-    end
-    --]]
+    love.graphics.setFont(fnt) -- set the font
     opacity = 5
     tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version 2.0.1 bugs may occur. \n Continue ?", {"Yes", "No"}, "warning") -- message box
     if tmp == 2 then
         love.event.quit(0) -- quit if no is pressed
     end
-    love.graphics.setFont(fnt) -- set the font
-    if love.system.getOS() ~= "Windows" and love.system.getOS() ~= "Linux" then -- TODO use a table for tested OSs here
-        love.window.showMessageBox("Warning", "Ver-2.0.1-B-ALPHA has not been fully tested on "..love.system.getOS(), "warning")
+    local testedos = {"Windows", "Linux"}
+    for i = 1, #testedos, 1 do
+        if testedos[i] == love.system.getOS() then
+            break
+        elseif i == #testedos then
+            love.window.showMessageBox("Warning", "Typer has not been tested on "..love.system.getOS(), "warning")
+        end
+    end
+    tmp = 0
+    for i = 1, #ar, 1 do
+        if ar[i] ~= "\n" then
+            tmp = tmp + 1
+        else
+            tmp = 0
+        end
+    end
+    if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+        i = 0
+        while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+            i = i + 1
+            x = x - 314 * love.timer.getDelta()
+        end
     end
 end
 function love.update(dt)
@@ -60,21 +74,17 @@ function love.update(dt)
                     tmp = tmp + 1
                 end
             end
-            --[[
-            if tmp * (12 ^ 2) > 12 ^ 2 / (love.graphics.getWidth() * 12) then
-                print("here")
-            end
-            -]]
         end
-    end
-    ar[#ar] = nil
-    if mode == "run" then
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
+            ar[#ar] = nil
             print("Saved "..os.time())
             save_ar(0)
+            ar[#ar + 1] = "\b"
         end
     end
-    ar[#ar + 1] = "\b"
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") then
+        error("Error init by user")
+    end
 end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
@@ -135,6 +145,19 @@ function love.draw()
     end
 end
 function love.keypressed(key)
+    tmp = 0
+    for i = 1, #ar, 1 do
+        if ar[i] ~= "\n" then
+            tmp = tmp + 1
+        else
+            tmp = 0
+        end
+    end
+    if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+        while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+            x = x - 314 * love.timer.getDelta()
+        end
+    end
     ar[#ar] = nil
     if key == "escape" and mode ~= "run" then
         mode = "run"
@@ -156,6 +179,7 @@ function love.keypressed(key)
                 ar[#ar - 1] = nil
             else
                 ar[#ar + 1] = "\n"
+                x = 0
             end
         else
             if mode == "file opn" then
@@ -207,6 +231,27 @@ function love.keypressed(key)
     if key == "backspace" or key == "up" then
         if mode == "run" then
             save_ar(0)
+            tmp = 0
+            for i = 1, #ar, 1 do
+                if ar[i] ~= "\n" then
+                    tmp = tmp + 1
+                else
+                    tmp = 0
+                end
+            end
+            if tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+                if x + 314 * love.timer.getDelta() < 0 then
+                    while tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+                        x = x + 314 * love.timer.getDelta()
+                        if x > love.graphics.getWidth() then
+                            x = 0
+                            break
+                        end
+                    end
+                else
+                    x = 0
+                end
+            end
             if not(y == 0) then
                 if ar[#ar] == "\n" then
                     if y > 0 then
@@ -216,11 +261,6 @@ function love.keypressed(key)
                     end
                 end
             end
-            --[[
-            if not(x == 0) then
-                x = x + 12
-            end
-            --]]
         end
         ar[#ar] = nil
     end
@@ -230,4 +270,6 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
     ar[#ar] = nil
     ar[#ar + 1] = key
     ar[#ar + 1] = "\b"
+    print("Placed "..key.." into ar")
 end
+-- I swear to god i am trying to write maintainable code :(

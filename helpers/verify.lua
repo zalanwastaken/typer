@@ -1,31 +1,44 @@
 print("Starting verification...")
-function error(errdef)
+function error(errordef)
+    print("Um excuse me what the actual fuck just happned ?")
+    print("Error: "..errordef)
     local fnt = love.graphics.newFont(20)
     function love.draw()
         love.graphics.setFont(fnt)
-        love.graphics.setBackgroundColor(1, 0, 0)
-        love.graphics.printf(errdef, 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
+        love.graphics.setBackgroundColor(0, 0, 1)
+        love.graphics.printf(errordef, 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
     end
     function love.update(dt)
         -- do nothing
     end
+    function love.textinput(key)
+        -- do nothing
+    end
 end
-local files = { -- list/arraay of files 
+local files = { -- list/array of files 
+    -- / dir
     "main.lua",
     "conf.lua",
+    "licence.txt",
+    -- /libs dir
     "libs/sav.lua",
     "libs/funcs.lua",
+    "libs/jsonlib.lua",
+    -- /data dir
     "data/icon.png",
     "data/name.png",
+    "data/settings.json",
+    -- /html dir
     "html/index.html",
     "html/images/love.ico",
     "html/data/love2d-license.txt",
     "html/info.html",
     "html/images/icon.png",
     "html/help.html",
-    "libs/jsonlib.lua",
-    "data/settings.json",
-    "licence.txt"
+    "html/Dontopenme.html",
+    "html/.troll",
+    -- /helpers dir
+    "helpers"
 }
 local fnf = {} -- list of files that are not found 
 for i = 1, #files, 1 do -- verify the files here

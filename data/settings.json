@@ -1,5 +1,5 @@
 { 
-    " beta_renderer " : false ,
-    " verify " : true ,
-    " beta_features " : false
+    "beta_renderer":false,
+    "verify":true,
+    "beta_features":false
 }

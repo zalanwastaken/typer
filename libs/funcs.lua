@@ -45,33 +45,33 @@ function save_ar(offset)
     end
     save("saves/def_save.txt", tmp)
 end
-function error(errordef, recovery)
-    print("error: "..errordef)
+function error(errordef)
+    --files ops
+    print("Saving ar")
+    ar[#ar] = nil -- remove \b char
+    save_ar(0)
     love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events\n".."Error: "..errordef)
+    -- init vars
+    mode = "error"
     local errpng = love.graphics.newImage("data/err.png")
     local fnt = love.graphics.newFont(20)
-    local fnt_2 = love.graphics.newFont(16)
+    local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
+    print("error: "..errordef)
+    -- love funcs
     function love.draw()
         love.graphics.setBackgroundColor(0, 0, 1)
         love.graphics.draw(errpng, 0, 0, 0, 2, 2)
         love.graphics.setFont(fnt)
         love.graphics.printf("Error: "..errordef, 0, errpng:getWidth() * 2, love.graphics.getWidth())
-        love.graphics.print("You can close this program now \nDont worry all your data is saved.", 0, (errpng:getWidth() * 2) + 45)
-        love.graphics.setFont(fnt_2)
-        if recovery then
-            love.graphics.print("Press R to attempt recovery")
-            if love.keyboard.isDown("r") then
-                tmp = love.window.showMessageBox("Recovery", "This will start TYPER in recovery mode. \nContinue ?", {"Yes", "No"}, "warning")
-                if tmp == 1 then
-                    require("../main")
-                end
-            end
-        else
-            love.graphics.print("Recovery not possible")
-        end
-        --love.graphics.print("OwO ??? Looks like we made a fuckey wukey", 0, love.graphics.getHeight() - 16) -- seek and you shall find ;)
+        love.graphics.print("Typer ran into a error that it cant handle \nYou can close this program now \nDont worry all your data is saved.\nPress CTRL+C to copy this error", 0, (errpng:getWidth() * 2) + 45)
     end
     function love.update(dt)
+        if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
+            love.system.setClipboardText("Typer error "..errordef)
+            love.audio.play(sound)
+        end
+    end
+    function love.textinput(key)
         -- do nothing
     end
 end
