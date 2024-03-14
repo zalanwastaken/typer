@@ -6,7 +6,6 @@ function read(filename)
             if filedata:sub(i, i) ~= "," or filedata:sub(i, i) ~= "{" or filedata:sub(i, i) ~= "}" or filedata:sub(i, i) ~= "," or filedata:sub(i, i) ~= ":" or filedata:sub(i, i) ~= [["]] then
                 process[i] = filedata:sub(i, i)
             end
-            print(process[i])
         end
         filedata = nil
         local out = ""
