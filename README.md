@@ -1,6 +1,6 @@
 A text editor made with LOVE2D.
->Why ?<br>
->Because why not !<br>
+Why ?<br>
+Because why not !<br>
 **This "text editor" is made for fun and is supposed to serve no real perpous.**<br>
 Read html/help.html for help :D<br>
 **LOVE2D is required to run this project.**<br>
