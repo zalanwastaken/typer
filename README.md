@@ -1,8 +1,8 @@
 # Typer<br>
 ## A text editor made with LOVE2D.<br>
+**LOVE2D is required to run this project**
+**LOVE2D: https://love2d.org/**
 <hr>
-__LOVE2D is required to run this project.__ <br>
-__LOVE2D : https://love2d.org/ __ <br>
 Why ?<br>
 Because why not !<br>
 **This "text editor" is made for fun and is supposed to serve no real perpous.**<br>
