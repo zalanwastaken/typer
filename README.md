@@ -1,5 +1,5 @@
-#Typer<br>
-##A text editor made with LOVE2D.<br>
+# Typer<br>
+## A text editor made with LOVE2D.<br>
 <hr>
 **LOVE2D is required to run this project.**<br>
 **LOVE2D : https://love2d.org/**<br>
