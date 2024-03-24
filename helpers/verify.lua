@@ -28,6 +28,8 @@ local files = { -- list/array of files
     "data/icon.png",
     "data/name.png",
     "data/settings.json",
+    "data/logo.txt",
+    "data/sounds/ping.mp3",
     -- /html dir
     "html/index.html",
     "html/images/love.ico",
@@ -73,3 +75,7 @@ if love.filesystem.isFused() then
 end
 love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."OS: "..love.system.getOS())
 print("Verification complete...")
+--print text art logo to console (Idk why but its cool)
+local textlogo = love.filesystem.read("data/logo.txt")
+print(textlogo)
+textlogo = nil
