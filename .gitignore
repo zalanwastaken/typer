@@ -1,2 +1,5 @@
 /.vscode
+#Remove the following in FULL-Releases FULL-RELEASE
+/Linux-run.sh
 /SETUP.sh
+/template.lua

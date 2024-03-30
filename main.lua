@@ -59,6 +59,7 @@ function love.load()
             x = x - 314 * love.timer.getDelta()
         end
     end
+    love.keyboard.setTextInput(true)
 end
 function love.update(dt)
     if mode == "run" then
