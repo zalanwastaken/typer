@@ -1,12 +1,12 @@
 print("Starting verification...")
 function error(errordef)
-    print("Um excuse me what the actual fuck just happned ?")
     print("Error: "..errordef)
     local fnt = love.graphics.newFont(20)
     function love.draw()
         love.graphics.setFont(fnt)
         love.graphics.setBackgroundColor(0, 0, 1)
         love.graphics.printf(errordef, 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
+        love.graphics.print(__VER__, 5, love.graphics.getHeight() - 20)
     end
     function love.update(dt)
         -- do nothing
@@ -16,7 +16,7 @@ function error(errordef)
     end
 end
 local files = { -- list/array of files 
-    -- / dir
+    -- /dir
     "main.lua",
     "conf.lua",
     "licence.txt",
@@ -40,7 +40,8 @@ local files = { -- list/array of files
     "html/Dontopenme.html",
     "html/.troll",
     -- /helpers dir
-    "helpers"
+    "helpers",
+    "helpers/commons.lua"
 }
 local fnf = {} -- list of files that are not found 
 for i = 1, #files, 1 do -- verify the files here
@@ -54,14 +55,15 @@ for i = 1, #files, 1 do -- verify the files here
 end
 if love.filesystem.getInfo("verification_log.log") == nil then
     love.filesystem.newFile("verification_log.log")
-    love.filesystem.write("verification_log.log", "First Boot ?\n")
+    love.filesystem.write("verification_log.log", "First Boot\n"..os.time().."\n")
     local msg = love.window.showMessageBox("First boot", "This is the first boot \nWould you like to read the manuel ?", {"Yes", "No"}, "info")
     if msg == 1 then
         love.system.openURL(love.filesystem.getSource().."/html/help.html")
     end
 else
-    love.filesystem.write("verification_log.log", "") -- clean the log
+    love.filesystem.write("verification_log.log", os.time()) -- clean the log
 end
+love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
 if #fnf > 0 then
     love.filesystem.write("verification_log.log", "Files not found: \n")
     for i = 1, #fnf, 1 do -- write fnf to log
@@ -69,11 +71,17 @@ if #fnf > 0 then
     end
     print("Verification complete with errors...")
     error("Required files not found see "..love.filesystem.getAppdataDirectory().."/LOVE/typer/verification_log.log for more info.") -- error out
+else
+    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nVerification compleated successfully")
 end
+love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
 if love.filesystem.isFused() then
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nEvents:".."\nInstalltion is fused: "..love.filesystem.getSource()) -- write fused status to log
+    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nInstalltion is fused: "..love.filesystem.getSource()) -- write fused status to log
+else
+    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nInstalltion is not fused: "..love.filesystem.getSource()) -- write fused status to log
 end
-love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."OS: "..love.system.getOS())
+love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
+love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nOS: "..love.system.getOS())
 print("Verification complete...")
 --print text art logo to console (Idk why but its cool)
 local textlogo = love.filesystem.read("data/logo.txt")

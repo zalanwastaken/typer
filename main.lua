@@ -15,9 +15,7 @@ function love.load()
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
     --OwO u actually read comments ?
-    tmp = 0 -- init tmp (tmp is a general use variable)
     love.filesystem.createDirectory("saves") -- create the saves dir
-    ar = {} -- user input array (ar = array) 
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
     set = read("data/settings.json")
@@ -28,13 +26,14 @@ function love.load()
     name_image = love.graphics.newImage("data/name.png")
     y = 0 -- the y pos of the draw array
     x = 0 -- the x pos of the draw array
-    mode = "run" -- current mode of the program
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
     opacity = 5
-    tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version 2.0.1 bugs may occur. \n Continue ?", {"Yes", "No"}, "warning") -- message box
-    if tmp == 2 then
-        love.event.quit(0) -- quit if no is pressed
+    if __TYPE__ ~= "FR" then
+        tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version "..__VER__.." bugs may occur. \nContinue ?", {"Yes", "No"}, "warning") -- message box
+        if tmp == 2 then
+            love.event.quit(0) -- quit if no is pressed
+        end
     end
     local testedos = {"Windows", "Linux"}
     for i = 1, #testedos, 1 do
@@ -82,8 +81,10 @@ function love.update(dt)
             ar[#ar + 1] = "\b"
         end
     end
-    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") then
-        error("Error init by user")
+    if __TYPE__ ~= "FR" then
+        if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") then
+            error("Error init by user")
+        end
     end
 end
 function love.draw()
@@ -272,4 +273,3 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
     ar[#ar + 1] = "\b"
     print("Placed "..key.." into ar")
 end
--- I swear to god i am trying to write maintainable code :(

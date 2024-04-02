@@ -50,7 +50,8 @@ function error(errordef)
     print("Saving ar")
     ar[#ar] = nil -- remove \b char
     save_ar(0)
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events\n".."Error: "..errordef)
+    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
+    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events:\n".."Error: "..errordef)
     -- init vars
     mode = "error"
     local errpng = love.graphics.newImage("data/err.png")
