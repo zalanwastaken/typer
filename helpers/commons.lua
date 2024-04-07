@@ -4,3 +4,4 @@ ar = {} -- user input array (ar = array)
 mode = "run" -- current mode of the program
 __VER__ = [[2.0.1 "Munch"]]
 __TYPE__ = "DEV"
+__LOVEVER__ = 11.5
