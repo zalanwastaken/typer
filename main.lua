@@ -9,8 +9,12 @@ function love.load()
             love.filesystem.newFile("verification_log.log") -- create the log file if it does not exists
             love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") -- write the log
         end
-        error("We are currently unable to verify interigrity for the safety of your data this program will now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
+        error("We are currently unable to verify interigrity for the safety of your data this programwill now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
+    logger = require("libs/logger")
+    logger.utils.line()
+    logger.utils.logo()
+    logger.write("verification_log.log", true)
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library

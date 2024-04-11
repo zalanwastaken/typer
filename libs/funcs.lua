@@ -59,18 +59,18 @@ function error(errordef)
     local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
     print("error: "..errordef)
     -- love funcs
+    function love.update(dt)
+        if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
+            love.system.setClipboardText("Typer error "..errordef)
+            love.audio.play(sound)
+        end
+    end
     function love.draw()
         love.graphics.setBackgroundColor(0, 0, 1)
         love.graphics.draw(errpng, 0, 0, 0, 2, 2)
         love.graphics.setFont(fnt)
         love.graphics.printf("Error: "..errordef, 0, errpng:getWidth() * 2, love.graphics.getWidth())
         love.graphics.print("Typer ran into a error that it cant handle \nYou can close this program now \nDont worry all your data is saved.\nPress CTRL+C to copy this error", 0, (errpng:getWidth() * 2) + 45)
-    end
-    function love.update(dt)
-        if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
-            love.system.setClipboardText("Typer error "..errordef)
-            love.audio.play(sound)
-        end
     end
     function love.textinput(key)
         -- do nothing

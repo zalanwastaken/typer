@@ -8,4 +8,5 @@ function love.conf(t)
     t.version = __LOVEVER__ -- set the love2d version
     t.window.title = __VER__ -- set the window title
     t.window.resizable = true -- make the window resizeable
+    love.setDeprecationOutput(false)
 end
