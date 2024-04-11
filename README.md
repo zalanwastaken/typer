@@ -14,10 +14,17 @@ Read html/help.html for help :D<br>
 git clone https://github.com/zalanwastaken/typer.git typer
 ```
 2. Install LOVE2D
+
+**APT**
 ```BASH
 sudo add-apt-repository ppa:bartbes/love-stable -y
 sudo apt update -y
 sudo apt intall love -y
+```
+**PACMAN**
+```BASH
+sudo pacman -Syy
+sudo pacman -S love
 ```
 3. Run Linux-run.sh
 ```BASH
