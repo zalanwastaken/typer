@@ -179,9 +179,11 @@ function love.keypressed(key)
                 ar = {}
                 mode = "file sav"
             elseif ar[#ar - 2] == "/" and ar[#ar - 1] == "h" and ar[#ar] == "/" then
-                love.system.openURL(love.filesystem.getSource().."/html/help.html")
-                ar[#ar - 2] = nil
-                ar[#ar - 1] = nil
+                --love.system.openURL(love.filesystem.getSource().."/html/help.html")
+                love.system.openURL(__HTML__.."/help.html")
+                for i = 1, 3, 1 do
+                    ar[#ar] = nil
+                end
             else
                 ar[#ar + 1] = "\n"
                 x = 0

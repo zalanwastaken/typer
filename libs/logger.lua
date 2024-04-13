@@ -54,4 +54,5 @@ function logger.utils.autowrite()
         return(success)
     end
 end
+--return logger table
 return(logger)
