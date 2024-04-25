@@ -8,7 +8,7 @@ A: Because why not !
 Read html/help.html for help :D<br>
 ## How to install
 ### Linux
-**NOTE: 2.0.1-PRE-2 Has a installer for Linux**
+**NOTE: 2.0.1-PRE-2 Has a installer for Linux(FOR APT NOT FOR PACMAN)**
 1. Clone the repo
 ```BASH
 git clone https://github.com/zalanwastaken/typer.git typer
