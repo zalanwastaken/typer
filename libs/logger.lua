@@ -1,58 +1,39 @@
--- Vars
 local logger = {
-    utils = {},
-    charbuff = {}
+    datastack = love.thread.getChannel("datalogger"),
+    write = love.thread.newThread([[
+        require("love.timer")
+        require("helpers/commons") -- for __TYPE__ var
+        if not(love.filesystem.getInfo("logs")) then
+            love.filesystem.createDirectory("logs")
+        end
+        local datastack = love.thread.getChannel("datalogger")
+        local file = "logs/log_"..os.time()..".log"
+        if not(love.filesystem.getInfo(file)) then
+            love.filesystem.newFile(file)
+            love.filesystem.write(file, os.date())
+        end
+        while true do
+            if __TYPE__ == "FR-NO-LOG" then
+                while true do
+                    local tmp = datastack:pop()
+                    if tmp == nil then
+                        break
+                    end
+                end
+                break
+            end
+            local data = datastack:pop()
+            local tmp
+            if data ~= nil and data ~= "STOP" then
+                tmp = love.filesystem.read(file)
+                love.filesystem.write(file, tmp..data)
+                print(data)
+            elseif data == "STOP" then
+                break
+            else
+                love.timer.sleep(0.1)
+            end
+        end
+    ]])
 }
--- logger funcs
-function logger.log(msg)
-    logger.charbuff[#logger.charbuff + 1] = msg
-end
-function logger.write(file, keep)
-    local tmp = ""
-    local success
-    for i = 1, #logger.charbuff, 1 do
-        tmp = tmp.."\n"..logger.charbuff[i]
-    end
-    if keep then
-        tmp = love.filesystem.read(file)..tmp
-    end
-    if love.filesystem.getInfo(file) then
-        success = love.filesystem.write(file, tmp)
-        return(success)
-    else
-        love.filesystem.newFile(file)
-        success = love.filesystem.write(file, tmp)
-        return(success)
-    end
-end
-function logger.clear()
-    logger.charbuff = {}
-end
--- logger utils
-function logger.utils.line()
-    logger.charbuff[#logger.charbuff + 1] = "--------------------"
-end
-function logger.utils.logo()
-    logger.charbuff[#logger.charbuff + 1] = love.filesystem.read("data/logo.txt")
-end
-function logger.utils.autowrite()
-    local tmp = ""
-    local success
-    local file = os.time()
-    for i = 1, #logger.charbuff, 1 do
-        tmp = tmp.."\n"..logger.charbuff[i]
-    end
-    if keep then
-        tmp = love.filesystem.read(file)..tmp
-    end
-    if love.filesystem.getInfo(file) then
-        success = love.filesystem.write(file, tmp)
-        return(success)
-    else
-        love.filesystem.newFile(file)
-        success = love.filesystem.write(file, tmp)
-        return(success)
-    end
-end
---return logger table
 return(logger)

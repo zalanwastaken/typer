@@ -1,4 +1,5 @@
 # Typer<br>
+**DM me for better name ideas :|**
 ## A text editor made with LOVE2D.<br>
 **[LOVE2D](https://love2d.org/) is required to run this project**
 ```
@@ -6,6 +7,18 @@ Q: Why ?
 A: Because why not !
 ```
 Read html/help.html for help :D<br>
+### **Note: make sure git is installed (both windows and linux)<br>If not:**
+### Linux:
+### APT
+```
+sudo apt install git -y
+```
+### PACMAN
+```
+sudo pacman -S git
+```
+### Windows:
+**Use the git installer for windows**
 ## How to install
 ### Linux
 **NOTE: 2.0.1-PRE-2 Has a installer for Linux(FOR APT NOT FOR PACMAN)**
@@ -19,7 +32,7 @@ git clone https://github.com/zalanwastaken/typer.git typer
 ```BASH
 sudo add-apt-repository ppa:bartbes/love-stable -y
 sudo apt update -y
-sudo apt intall love -y
+sudo apt install love -y
 ```
 **PACMAN**
 ```BASH

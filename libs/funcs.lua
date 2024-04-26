@@ -50,14 +50,18 @@ function error(errordef)
     print("Saving ar")
     ar[#ar] = nil -- remove \b char
     save_ar(0)
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events:\n".."Error: "..errordef)
+    local logger = require("libs/logger")
+    logger.datastack:push("\n--------------------")
+    logger.datastack:push("\n".."Events:\n".."Error: "..errordef)
+    --love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
+    --love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events:\n".."Error: "..errordef)
     -- init vars
     mode = "error"
     local errpng = love.graphics.newImage("data/err.png")
     local fnt = love.graphics.newFont(20)
     local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
     print("error: "..errordef)
+    logger.datastack:push("STOP")
     -- love funcs
     function love.update(dt)
         if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then

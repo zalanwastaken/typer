@@ -6,7 +6,11 @@ function error(errordef)
         love.graphics.setFont(fnt)
         love.graphics.setBackgroundColor(0, 0, 1)
         love.graphics.printf(errordef, 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
-        love.graphics.print(__VER__, 5, love.graphics.getHeight() - 20)
+        if __VER__ ~= nil then
+            love.graphics.print(__VER__, 5, love.graphics.getHeight() - 20)
+        else
+            love.graphics.print("Unable to determine.", 5, love.graphics.getHeight() - 20)
+        end
     end
     function love.update(dt)
         -- do nothing
@@ -102,18 +106,22 @@ if #fnf > 0 then
     error("Required files not found see "..love.filesystem.getAppdataDirectory().."/LOVE/typer/verification_log.log for more info.") -- error out
 else
     love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nVerification compleated successfully")
+    --datastack:push("\nVerification compleated successfully")
 end
-love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
+local logger = require("libs/logger")
+logger.datastack:push("\n--------------------")
 if love.filesystem.isFused() then
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nInstalltion is fused: "..love.filesystem.getSource()) -- write fused status to log
+    logger.datastack:push("\nInstalltion is fused: "..love.filesystem.getSource())
 else
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nInstalltion is not fused: "..love.filesystem.getSource()) -- write fused status to log
+    logger.datastack:push("\nInstalltion is not fused: "..love.filesystem.getSource())
 end
-love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------\nOS:"..love.system.getOS())
+logger.datastack:push("\n--------------------\nOS:"..love.system.getOS())
 print("Verification complete...")
 --print text art logo to console (Idk why but its cool)
+--[[
 local textlogo = love.filesystem.read("data/logo.txt")
 print(textlogo)
 textlogo = nil
+--]]
 files = nil
 fnf = nil 

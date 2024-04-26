@@ -12,9 +12,8 @@ function love.load()
         error("We are currently unable to verify interigrity for the safety of your data this programwill now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
     logger = require("libs/logger")
-    logger.utils.line()
-    logger.utils.logo()
-    logger.write("verification_log.log", true)
+    logger.datastack:push("\nMade by Zalan(Zalander)")
+    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
@@ -23,7 +22,7 @@ function love.load()
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
     set = read("data/settings.json")
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
+    logger.datastack:push("\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
     name = false
     timer = 0
@@ -33,7 +32,7 @@ function love.load()
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
     opacity = 5
-    if __TYPE__ ~= "FR" then
+    if __TYPE__ ~= "FR" and __TYPE__ ~= "FR-NO-LOG" then
         tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version "..__VER__.." bugs may occur. \nContinue ?", {"Yes", "No"}, "warning") -- message box
         if tmp == 2 then
             love.event.quit(0) -- quit if no is pressed
@@ -62,6 +61,7 @@ function love.load()
             x = x - 314 * love.timer.getDelta()
         end
     end
+    logger.write:start()
 end
 function love.update(dt)
     if mode == "run" then
@@ -279,3 +279,8 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
     ar[#ar + 1] = "\b"
     print("Placed "..key.." into ar")
 end
+--[[
+    * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
+    ! BTW dont steal my code because that would be bad :( (You can use it but pls mention that it was modified and dont claim to be the owner of Typer)
+    ? Fun fact Typer was never ment to be Open sourse heck it wasent even ment to be public
+--]]
