@@ -33,6 +33,7 @@ function initar(file, add)
     if ar[#ar - 1] == "n" then
         ar[#ar - 1] = ""
     end
+    logger.datastack:push("ar init from "..file.."\n") -- ! logger.lua is required for this
 end
 function save_ar(offset)
     tmp = ""
@@ -44,9 +45,10 @@ function save_ar(offset)
         end
     end
     save("saves/def_save.txt", tmp)
+    logger.datastack:push("ar saved\n") -- ! logger.lua required for this
 end
 function error(errordef)
-    --files ops
+    -- * files ops
     print("Saving ar")
     ar[#ar] = nil -- remove \b char
     save_ar(0)
@@ -62,8 +64,9 @@ function error(errordef)
     local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
     print("error: "..errordef)
     logger.datastack:push("STOP")
-    -- love funcs
+    -- * love funcs
     function love.update(dt)
+        -- ? Allow user to copy the error
         if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
             love.system.setClipboardText("Typer error "..errordef)
             love.audio.play(sound)
@@ -77,7 +80,13 @@ function error(errordef)
         love.graphics.print("Typer ran into a error that it cant handle \nYou can close this program now \nDont worry all your data is saved.\nPress CTRL+C to copy this error", 0, (errpng:getWidth() * 2) + 45)
     end
     function love.textinput(key)
-        -- do nothing
+        -- * do nothing
+    end
+    function love.keypressed(key)
+        -- * do nothing
+    end
+    function love.quit()
+        return false -- ? always quit
     end
 end
 function exportar(filename, data)
@@ -95,4 +104,5 @@ function exportar(filename, data)
     else
         love.window.showMessageBox("File already exists", "File already exists", "error")
     end
+    logger.datastack:push("ar saved to "..filename.."\n") -- ! logger.lua required for this
 end

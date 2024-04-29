@@ -61,6 +61,12 @@ function love.load()
             x = x - 314 * love.timer.getDelta()
         end
     end
+    ping = love.audio.newSource("data/sounds/ping.mp3", "static")
+    -- ? log some more info
+    local major, minnor, rev, codename = love.getVersion()
+    logger.datastack:push("LOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n")
+    logger.datastack:push("VER: "..__VER__.."\n")
+    logger.datastack:push("TYPE: "..__TYPE__.."\n")
     logger.write:start()
 end
 function love.update(dt)
@@ -112,7 +118,9 @@ function love.draw()
             love.graphics.print(i, 0, i * 14 + y)
         end
         love.graphics.rectangle("line", 0, love.graphics.getHeight() - 20, love.graphics.getWidth(), 30)
-        love.graphics.print("This is a extreamly early protoype !", 0, love.graphics.getHeight() - 20)
+        if __TYPE__ == "DEV" then
+            love.graphics.print("This is a unfinished version !", 0, love.graphics.getHeight() - 20)
+        end
         if mode == "run" then
             love.graphics.print("Press CTRL + s to save", 12 * 36, love.graphics.getHeight() - 20)
         elseif mode == "file opn" then
@@ -171,7 +179,7 @@ function love.keypressed(key)
     end
     if key == "return" or key == "down" then
         if mode == "run" then
-            save_ar(2) --save ar comes from the funcs.lua file in the libs folder
+            --save_ar(2) -- ? save ar comes from the funcs.lua file in the libs folder
             if ar[#ar - 1] == "/" and ar[#ar] == "l" then
                 ar = {}
                 mode = "file opn"
@@ -237,7 +245,7 @@ function love.keypressed(key)
     end
     if key == "backspace" or key == "up" then
         if mode == "run" then
-            save_ar(0)
+            --save_ar(0)
             tmp = 0
             for i = 1, #ar, 1 do
                 if ar[i] ~= "\n" then
@@ -278,9 +286,29 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
     ar[#ar + 1] = key
     ar[#ar + 1] = "\b"
     print("Placed "..key.." into ar")
+    logger.datastack:push("Placed "..key.." in ar\n")
 end
+function love.quit()
+    logger.datastack:push("Exit init\n")
+    love.audio.play(ping)
+    love.timer.sleep(0.01) -- ? wait a little for the sound to play
+    local usrchoise = love.window.showMessageBox("Exit", "Exit ?", {"Yes", "No"})
+    if usrchoise == 1 then
+        ar[#ar] = nil
+        save_ar(0)
+        logger.datastack:push("Exited\n")
+        logger.datastack:push("STOP")
+        logger.write:wait() -- ? wait for the logger to stop
+        return false
+    else
+        logger.datastack:push("Exit aboorted\n")
+        return true
+    end
+end
+
 --[[
     * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
     ! BTW dont steal my code because that would be bad :( (You can use it but pls mention that it was modified and dont claim to be the owner of Typer)
     ? Fun fact Typer was never ment to be Open sourse heck it wasent even ment to be public
+    ? Oh and i used to write these massages as comments at the end of the main.lua file when i was really new to coding
 --]]

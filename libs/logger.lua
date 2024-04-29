@@ -12,6 +12,23 @@ local logger = {
             love.filesystem.newFile(file)
             love.filesystem.write(file, os.date())
         end
+        if #love.filesystem.getDirectoryItems("logs") >= 12 then
+            local filetmp = love.filesystem.getDirectoryItems("logs")
+            local minval = 1
+            for i = 1, #filetmp, 1 do
+                if filetmp[i] == "verification_log.log" then
+                    minval = minval + 1
+                end
+            end
+            print(minval)
+            for i = 1, #filetmp-minval, 1 do
+                if filetmp[i] ~= nil then
+                    love.filesystem.remove("logs/"..filetmp[i])
+                else
+                    break
+                end
+            end
+        end
         while true do
             if __TYPE__ == "FR-NO-LOG" then
                 while true do
@@ -23,11 +40,14 @@ local logger = {
                 break
             end
             local data = datastack:pop()
-            local tmp
+            local tmp, size
             if data ~= nil and data ~= "STOP" then
-                tmp = love.filesystem.read(file)
+                tmp, size = love.filesystem.read(file)
                 love.filesystem.write(file, tmp..data)
                 print(data)
+                if size >= 500000 then --? 500000Bytes = 4 MB
+                    print("Warning: file is large, read write speed reduced")
+                end
             elseif data == "STOP" then
                 break
             else
