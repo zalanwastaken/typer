@@ -129,6 +129,9 @@ if #fnf > 0 then
     error("Required files not found.\nCheck: "..love.filesystem.getAppdataDirectory().."love/typer/logs/verfication_log.log")
 else
     logger = require("libs/logger")
+    for i = 1, #files, 1 do
+        logger.datastack:push(files[i].."...OK\n")
+    end
     logger.datastack:push("\nFiles verified "..#files.."\n")
     logger.datastack:push("ALL VERIFIED\n")
 end

@@ -11,6 +11,16 @@ function getnewlines(array, offset)
         end
     end
 end
+function gettnewlinesstring(str)
+    -- Use string.gsub() to replace all occurrences of '\n' with an empty string
+    local modifiedStr, count = str:gsub("\n", "")
+
+    -- Count the number of occurrences by comparing the lengths of the original and modified strings
+    local newlineCount = #str - #modifiedStr
+
+    -- Return the count of newline characters
+    return newlineCount
+end
 function initar(file, add)
     tmp = load(file)
     for i = 1, #tmp, 1 do
@@ -105,4 +115,14 @@ function exportar(filename, data)
         love.window.showMessageBox("File already exists", "File already exists", "error")
     end
     logger.datastack:push("ar saved to "..filename.."\n") -- ! logger.lua required for this
+end
+function removeCharsKeepNumbers(str)
+    -- Define a pattern to match characters that you want to remove
+    local pattern = "[^%d]+"  -- This pattern matches any character that is not a digit
+
+    -- Use string.gsub() to replace all matches of the pattern with an empty string
+    local result = str:gsub(pattern, "")
+
+    -- Return the modified string
+    return result
 end

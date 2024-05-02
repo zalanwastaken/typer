@@ -77,11 +77,11 @@ git clone https://github.com/zalanwastaken/typer.git typer
 ```BASH
 love typer
 ```
-## TODO (Most important to least important)
-1. Make a installer for windows
-2. Fix some bugs
-3. Add Robust error handling
-4. Make the first Full-Release 
+## TODO
+1. Make a installer for windows...Pending
+2. Fix some bugs..Doing
+3. Add Robust error handling...Doing
+4. Make the first Full-Release...Pending
 ## NOTES
 I currently have no plans to make an installer for MACOS.
 I have yet to determine the Full-Release date

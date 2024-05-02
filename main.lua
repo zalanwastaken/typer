@@ -31,8 +31,12 @@ function love.load()
     x = 0 -- the x pos of the draw array
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
+    ping = love.audio.newSource("data/sounds/ping.mp3", "static")
     opacity = 5
-    if __TYPE__ ~= "FR" and __TYPE__ ~= "FR-NO-LOG" then
+    if __TYPE__ == "DEV" then
+        logger.datastack:push("WARNING: This build is configured as DEV !\n")
+        love.audio.play(ping)
+        love.timer.sleep(0.01) -- ? wait for the sound to play
         tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version "..__VER__.." bugs may occur. \nContinue ?", {"Yes", "No"}, "warning") -- message box
         if tmp == 2 then
             love.event.quit(0) -- quit if no is pressed
@@ -61,12 +65,9 @@ function love.load()
             x = x - 314 * love.timer.getDelta()
         end
     end
-    ping = love.audio.newSource("data/sounds/ping.mp3", "static")
     -- ? log some more info
     local major, minnor, rev, codename = love.getVersion()
-    logger.datastack:push("LOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n")
-    logger.datastack:push("VER: "..__VER__.."\n")
-    logger.datastack:push("TYPE: "..__TYPE__.."\n")
+    logger.datastack:push("LOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
     logger.write:start()
 end
 function love.update(dt)
@@ -146,8 +147,23 @@ function love.draw()
     else
         love.graphics.setColor(1, 1, 1, opacity)
         opacity = opacity - 3.14 * love.timer.getDelta() -- 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
-        love.graphics.draw(name_image, (love.graphics.getWidth() / 1.5) - name_image:getWidth(), (love.graphics.getHeight() / 1.5) - name_image:getHeight())
         timer = timer + 10 * love.timer.getDelta()
+        love.graphics.draw(name_image, (love.graphics.getWidth() / 1.5) - name_image:getWidth(), (love.graphics.getHeight() / 1.5) - name_image:getHeight())
+        if __TYPE__ == "DEV" then
+            local x = 0
+            local y = 0
+            local files = love.filesystem.getDirectoryItems("logs")
+            for i = 1, #files, 1 do
+                files[i] = tonumber(removeCharsKeepNumbers(files[i]))
+            end
+            local filedata = love.filesystem.read("logs/log_"..tostring(math.max(unpack(files)))..".log")
+            if (gettnewlinesstring(filedata) + 3) * 18 - math.abs(y) > love.graphics.getHeight() then
+                while (gettnewlinesstring(filedata) + 3) * 14 - math.abs(y) > love.graphics.getHeight() do
+                    y = y - 12
+                end
+            end
+            love.graphics.print(filedata, x, y)
+        end
         if timer > 15 or (love.keyboard.isDown("space") and name == false) then
             name = true
             -- clean variables that are no longer needed 
@@ -285,7 +301,6 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
     ar[#ar] = nil
     ar[#ar + 1] = key
     ar[#ar + 1] = "\b"
-    print("Placed "..key.." into ar")
     logger.datastack:push("Placed "..key.." in ar\n")
 end
 function love.quit()
@@ -294,10 +309,9 @@ function love.quit()
     love.timer.sleep(0.01) -- ? wait a little for the sound to play
     local usrchoise = love.window.showMessageBox("Exit", "Exit ?", {"Yes", "No"})
     if usrchoise == 1 then
-        ar[#ar] = nil
-        save_ar(0)
         logger.datastack:push("Exited\n")
         logger.datastack:push("STOP")
+        save_ar(1)
         logger.write:wait() -- ? wait for the logger to stop
         return false
     else
@@ -305,7 +319,6 @@ function love.quit()
         return true
     end
 end
-
 --[[
     * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
     ! BTW dont steal my code because that would be bad :( (You can use it but pls mention that it was modified and dont claim to be the owner of Typer)
