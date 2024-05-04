@@ -12,8 +12,6 @@ function love.load()
         error("We are currently unable to verify interigrity for the safety of your data this programwill now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
     logger = require("libs/logger")
-    logger.datastack:push("\nMade by Zalan(Zalander)")
-    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
@@ -35,6 +33,7 @@ function love.load()
     opacity = 5
     if __TYPE__ == "DEV" then
         logger.datastack:push("WARNING: This build is configured as DEV !\n")
+        --logger.datastack:push("PRESS SPACE TO CONTINUE !\n")
         love.audio.play(ping)
         love.timer.sleep(0.01) -- ? wait for the sound to play
         tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version "..__VER__.." bugs may occur. \nContinue ?", {"Yes", "No"}, "warning") -- message box
@@ -68,6 +67,8 @@ function love.load()
     -- ? log some more info
     local major, minnor, rev, codename = love.getVersion()
     logger.datastack:push("LOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    logger.datastack:push("\nMade by Zalan(Zalander)")
+    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
 end
 function love.update(dt)
