@@ -93,10 +93,9 @@ function love.update(dt)
             ar[#ar + 1] = "\b"
         end
     end
-    if __TYPE__ ~= "FR" then
-        if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") then
-            error("Error init by user")
-        end
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") and __TYPE__ == "DEV" then
+        logger.datastack:push("ERROR INIT BY USER NOT A BUG")
+        error("Error init by user")
     end
 end
 function love.draw()

@@ -7,9 +7,10 @@ function getnewlines(array, offset)
         if array[tmp[1]] == "\n" then
             tmp[2] = tmp[2] + 1
         elseif array[tmp[1]] == nil then
-            return tmp[2]
+            break
         end
     end
+    return tmp[2]
 end
 function gettnewlinesstring(str)
     -- Use string.gsub() to replace all occurrences of '\n' with an empty string
@@ -58,45 +59,57 @@ function save_ar(offset)
     logger.datastack:push("ar saved\n") -- ! logger.lua required for this
 end
 function error(errordef)
-    -- * files ops
-    print("Saving ar")
-    ar[#ar] = nil -- remove \b char
-    save_ar(0)
-    local logger = require("libs/logger")
-    logger.datastack:push("\n--------------------")
-    logger.datastack:push("\n".."Events:\n".."Error: "..errordef)
-    --love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
-    --love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n".."Events:\n".."Error: "..errordef)
-    -- init vars
-    mode = "error"
-    local errpng = love.graphics.newImage("data/err.png")
-    local fnt = love.graphics.newFont(20)
-    local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
-    print("error: "..errordef)
-    logger.datastack:push("STOP")
-    -- * love funcs
-    function love.update(dt)
-        -- ? Allow user to copy the error
-        if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
-            love.system.setClipboardText("Typer error "..errordef)
-            love.audio.play(sound)
+    if __TYPE__ ~= "DEV" or forceerr == true then
+        -- * files ops
+        local logger = require("libs/logger")
+        logger.datastack:push("\n--------------------")
+        logger.datastack:push("\n".."Events:\n".."Error: "..errordef.."\n")
+        logger.datastack:push("Mode: "..mode.."\n")
+        save_ar(1)
+        -- init vars
+        mode = "error"
+        local errpng = love.graphics.newImage("data/err.png")
+        local fnt = love.graphics.newFont(20)
+        local sound = love.audio.newSource("data/sounds/ping.mp3", "static")
+        print("error: "..errordef)
+        -- * love funcs
+        function love.update(dt)
+            -- ? Allow user to copy the error
+            if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and love.keyboard.isDown("c") then
+                love.system.setClipboardText("Typer error "..errordef)
+                love.audio.play(sound)
+            end
         end
-    end
-    function love.draw()
-        love.graphics.setBackgroundColor(0, 0, 1)
-        love.graphics.draw(errpng, 0, 0, 0, 2, 2)
-        love.graphics.setFont(fnt)
-        love.graphics.printf("Error: "..errordef, 0, errpng:getWidth() * 2, love.graphics.getWidth())
-        love.graphics.print("Typer ran into a error that it cant handle \nYou can close this program now \nDont worry all your data is saved.\nPress CTRL+C to copy this error", 0, (errpng:getWidth() * 2) + 45)
-    end
-    function love.textinput(key)
-        -- * do nothing
-    end
-    function love.keypressed(key)
-        -- * do nothing
-    end
-    function love.quit()
-        return false -- ? always quit
+        function love.draw()
+            love.graphics.setBackgroundColor(0, 0, 1)
+            love.graphics.draw(errpng, 0, 0, 0, 2, 2)
+            love.graphics.setFont(fnt)
+            love.graphics.printf("Error: "..errordef, 0, errpng:getWidth() * 2, love.graphics.getWidth())
+            love.graphics.print("Typer ran into a error that it cant handle \nYou can close this program now \nDont worry all your data is saved.\nPress CTRL+C to copy this error", 0, (errpng:getWidth() * 2) + 45)
+        end
+        function love.textinput(key)
+            -- * do nothing
+        end
+        function love.keypressed(key)
+            -- * do nothing
+        end
+        function love.quit()
+            logger.datastack:push("Exit in error mode\nforce error: "..tostring(forceerr).."\n")
+            logger.datastack:push("STOP")
+            logger.write:wait()
+            return false -- ? always quit
+        end
+    else
+        function love.quit()
+            return false -- ? always quit
+        end
+        local logger = require("libs/logger")
+        logger.datastack:push("ERROR IN DEV MODE !\n")
+        logger.datastack:push(errordef.."\n")
+        logger.datastack:push("STOP")
+        save_ar(1)
+        love.window.showMessageBox("ERROR", errordef, "error", {"Ok"})
+        love.event.quit(1)
     end
 end
 function exportar(filename, data)

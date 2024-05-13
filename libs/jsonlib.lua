@@ -17,3 +17,4 @@ function read(filename)
         return(nil)
     end
 end
+-- ! ALL JSON CONFIG CODE WILL BE REMOVED ! AND WILL BE REPLACED BY A LUA VARS CONFIG FILE

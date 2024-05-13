@@ -87,34 +87,6 @@ for i = 1, #files, 1 do -- verify the files here
         print("Done verified..."..files[i])
     end
 end
---[[
-    * to be removed in future
-if love.filesystem.getInfo("verification_log.log") == nil then
-    love.filesystem.newFile("verification_log.log")
-    love.filesystem.write("verification_log.log", "First Boot\n"..os.date().."\n")
-    local msg = love.window.showMessageBox("First boot", "This is the first boot \nWould you like to read the manuel ?", {"Yes", "No"}, "info")
-    if msg == 1 then
-        print("Opening help.html")
-        love.system.openURL(__HTML__.."/help.html")
-    else
-        print("Not opening help.html")
-    end
-else
-    love.filesystem.write("verification_log.log", os.date()) -- clean the log
-end
-love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n--------------------")
-if #fnf > 0 then
-    love.filesystem.write("verification_log.log", "Files not found: \n")
-    for i = 1, #fnf, 1 do -- write fnf to log
-        love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\n"..fnf[i])
-    end
-    print("Verification complete with errors...")
-    error("Required files not found see "..love.filesystem.getAppdataDirectory().."/LOVE/typer/verification_log.log for more info.") -- error out
-else
-    love.filesystem.write("verification_log.log", love.filesystem.read("verification_log.log").."\nVerification compleated successfully")
-    --datastack:push("\nVerification compleated successfully")
-end
---]]
 local logger
 if #fnf > 0 then
     if love.filesystem.getInfo("logs/verification_log.log") then
@@ -141,14 +113,7 @@ if love.filesystem.isFused() then
 else
     logger.datastack:push("\nInstalltion is not fused: "..love.filesystem.getSource())
 end
-logger.datastack:push("\n--------------------\nOS:"..love.system.getOS())
+logger.datastack:push("\n--------------------\nOS:"..love.system.getOS().."\n")
 print("Verification complete...")
---print text art logo to console (Idk why but its cool)
---[[
-    ! remove this
-local textlogo = love.filesystem.read("data/logo.txt")
-print(textlogo)
-textlogo = nil
---]]
 files = nil
-fnf = nil 
+fnf = nil
