@@ -59,9 +59,9 @@ function save_ar(offset)
     logger.datastack:push("ar saved\n") -- ! logger.lua required for this
 end
 function error(errordef)
+    local logger = require("libs/logger")
     if __TYPE__ ~= "DEV" or forceerr == true then
         -- * files ops
-        local logger = require("libs/logger")
         logger.datastack:push("\n--------------------")
         logger.datastack:push("\n".."Events:\n".."Error: "..errordef.."\n")
         logger.datastack:push("Mode: "..mode.."\n")
@@ -100,16 +100,15 @@ function error(errordef)
             return false -- ? always quit
         end
     else
-        function love.quit()
-            return false -- ? always quit
-        end
-        local logger = require("libs/logger")
         logger.datastack:push("ERROR IN DEV MODE !\n")
         logger.datastack:push(errordef.."\n")
         logger.datastack:push("STOP")
         save_ar(1)
         love.window.showMessageBox("ERROR", errordef, "error", {"Ok"})
         love.event.quit(1)
+        function love.quit()
+            return false -- ? always quit
+        end
     end
 end
 function exportar(filename, data)
@@ -130,12 +129,6 @@ function exportar(filename, data)
     logger.datastack:push("ar saved to "..filename.."\n") -- ! logger.lua required for this
 end
 function removeCharsKeepNumbers(str)
-    -- Define a pattern to match characters that you want to remove
-    local pattern = "[^%d]+"  -- This pattern matches any character that is not a digit
-
-    -- Use string.gsub() to replace all matches of the pattern with an empty string
-    local result = str:gsub(pattern, "")
-
-    -- Return the modified string
+    local result = str:gsub("[^%d]+", "")
     return result
 end

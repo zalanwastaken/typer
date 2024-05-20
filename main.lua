@@ -1,5 +1,5 @@
 function love.load()
-    if love.filesystem.getInfo("helpers/verify.lua") then
+    if love.filesystem.getInfo("helpers/verify") then
         require("helpers/verify") -- run the verification script
     else
         print("error: Unable to verify interigrity") -- if the script is not found print the error to the console
@@ -16,7 +16,9 @@ function love.load()
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
     --OwO u actually read comments ?
-    love.filesystem.createDirectory("saves") -- create the saves dir
+    if not(love.filesystem.getInfo("saves")) then
+        love.filesystem.createDirectory("saves") -- create the saves dir
+    end
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
     set = read("data/settings.json")
@@ -33,15 +35,16 @@ function love.load()
     opacity = 5
     if __TYPE__ == "DEV" then
         logger.datastack:push("WARNING: This build is configured as DEV !\n")
-        --logger.datastack:push("PRESS SPACE TO CONTINUE !\n")
         love.audio.play(ping)
         love.timer.sleep(0.01) -- ? wait for the sound to play
-        tmp = love.window.showMessageBox("Warning", "This is not a fully finished build of version "..__VER__.." bugs may occur. \nContinue ?", {"Yes", "No"}, "warning") -- message box
+        tmp = love.window.showMessageBox("Warning", "This build is configured as DEV\nDEV builds are only supposed to be for modders and developers\nContinue?", {"Yes", "No"}, "warning") -- message box
         if tmp == 2 then
+            function love.quit() -- ? Change the quit function to always quit
+                return false
+            end
             love.event.quit(0) -- quit if no is pressed
         end
     end
-    local testedos = {"Windows", "Linux"}
     for i = 1, #testedos, 1 do
         if testedos[i] == love.system.getOS() then
             break
@@ -66,7 +69,7 @@ function love.load()
     end
     -- ? log some more info
     local major, minnor, rev, codename = love.getVersion()
-    logger.datastack:push("LOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    logger.datastack:push("\nLOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
     logger.datastack:push("\nMade by Zalan(Zalander)")
     logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
@@ -97,6 +100,9 @@ function love.update(dt)
         logger.datastack:push("ERROR INIT BY USER NOT A BUG")
         error("Error init by user")
     end
+    if love.keyboard.isDown("escape") then
+        love.event.quit(0)
+    end
 end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
@@ -120,7 +126,9 @@ function love.draw()
         end
         love.graphics.rectangle("line", 0, love.graphics.getHeight() - 20, love.graphics.getWidth(), 30)
         if __TYPE__ == "DEV" then
-            love.graphics.print("This is a unfinished version !", 0, love.graphics.getHeight() - 20)
+            love.graphics.setColor(1, 0, 0)
+            love.graphics.print("DEV BUILD "..__VER__, 0, love.graphics.getHeight() - 20)
+            love.graphics.setColor(1, 1, 1)
         end
         if mode == "run" then
             love.graphics.print("Press CTRL + s to save", 12 * 36, love.graphics.getHeight() - 20)
@@ -154,7 +162,40 @@ function love.draw()
             local y = 0
             local files = love.filesystem.getDirectoryItems("logs")
             for i = 1, #files, 1 do
-                files[i] = tonumber(removeCharsKeepNumbers(files[i]))
+                files[i] = tonumber(removeCharsKeepNumbers(files[i])) -- * get the file id
+            end
+            for i = 1, #files, 1 do
+                if files[i] == nil then
+                    logger.datastack:push("STOP")
+                    logger.write:wait()
+                    local tmp = love.filesystem.getDirectoryItems("logs")
+                    for f = 1, #tmp, 1 do
+                        love.filesystem.remove("logs/"..tmp[f])
+                    end
+                    logger.datastack:push("BAD FILE IN LOGS\n")
+                    logger.datastack:push("LOG DATA LOST !\n")
+                    logger.datastack:push("REMOVED LOG FILES:\n")
+                    local formatstring = ""
+                    for i = 1, #tmp, 1 do
+                        formatstring = formatstring..tmp[i].."\n"
+                    end
+                    logger.datastack:push(formatstring)
+                    logger.write:start()
+                    love.timer.sleep(1)
+                    files = love.filesystem.getInfo("logs")
+                    for f = 1, #files, 1 do
+                        files[f] = tonumber(removeCharsKeepNumbers(files[f])) -- * get the file id
+                    end
+                    function love.quit() -- ? setup quit for love.event.quit("restart") to immedieatly restart
+                        return false
+                    end
+                    logger.datastack:push("Restarting LOVE\n")
+                    logger.datastack:push("STOP")
+                    logger.write:wait()
+                    love.event.quit("restart")
+                    return 1
+                    --break
+                end
             end
             local filedata = love.filesystem.read("logs/log_"..tostring(math.max(unpack(files)))..".log")
             if (gettnewlinesstring(filedata) + 3) * 18 - math.abs(y) > love.graphics.getHeight() then
@@ -174,6 +215,7 @@ function love.draw()
     end
 end
 function love.keypressed(key)
+    logger.datastack:push("Key pressed "..key.."\n")
     tmp = 0
     for i = 1, #ar, 1 do
         if ar[i] ~= "\n" then
@@ -260,6 +302,7 @@ function love.keypressed(key)
         end
     end
     if key == "backspace" or key == "up" then
+        logger.datastack:push(ar[#ar].." Removed from ar\n")
         if mode == "run" then
             --save_ar(0)
             tmp = 0
@@ -310,8 +353,17 @@ function love.quit()
     local usrchoise = love.window.showMessageBox("Exit", "Exit ?", {"Yes", "No"})
     if usrchoise == 1 then
         logger.datastack:push("Exited\n")
+        love.audio.stop(ping)
+        love.audio.play(ping)
+        love.timer.sleep(0.01) -- ? wait a little for the sound to play
+        usrchoise = love.window.showMessageBox("Save", "Save ?", {"Yes", "No"})
+        if usrchoise == 1 then
+            logger.datastack:push("Saved ar\n")
+            save_ar(1)
+        else
+            logger.datastack:push("Aborted saving ar\n")
+        end
         logger.datastack:push("STOP")
-        save_ar(1)
         logger.write:wait() -- ? wait for the logger to stop
         return false
     else

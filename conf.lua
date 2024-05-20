@@ -3,13 +3,17 @@ if love.filesystem.getInfo("helpers/commons.lua") then
     require("helpers/commons")
 else
     print("ERROR: helpers/commons.lua not found !")
-    --print("Um excuse me what the actual fuck just happned ?") -- ? not needed right now
+    error("commons.lua not found")
 end
 -- * config func
 function love.conf(t)
     t.console = true -- * set the console
     t.version = __LOVEVER__ -- * set the love2d version
-    t.window.title = __VER__ -- * set the window title
+    if __TYPE__== "DEV" then
+        t.window.title = "DEV BUILD "..__VER__
+    else
+        t.window.title = __VER__ -- * set the window title
+    end
     t.window.resizable = true -- * make the window resizeable
     love.setDeprecationOutput(false) -- ! Probably not a good idea
 end

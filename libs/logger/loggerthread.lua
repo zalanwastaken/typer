@@ -26,7 +26,7 @@ if #love.filesystem.getDirectoryItems("logs") >= 12 then
         end
     end
 end
-love.filesystem.write(file, love.filesystem.read(file).."\n LOGGER VER: "..__VER__.."\n")
+love.filesystem.write(file, love.filesystem.read(file).."\nLOGGER VER: "..__VER__.."\n")
 while true do
     if __TYPE__ == "FR-NO-LOG" then
         while true do
