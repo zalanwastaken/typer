@@ -215,130 +215,134 @@ function love.draw()
     end
 end
 function love.keypressed(key)
-    logger.datastack:push("Key pressed "..key.."\n")
-    tmp = 0
-    for i = 1, #ar, 1 do
-        if ar[i] ~= "\n" then
-            tmp = tmp + 1
-        else
-            tmp = 0
-        end
-    end
-    if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
-        while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
-            x = x - 314 * love.timer.getDelta()
-        end
-    end
-    ar[#ar] = nil
-    if key == "escape" and mode ~= "run" then
-        mode = "run"
-        ar = {}
-        initar("saves/def_save.txt", false)
-    end
-    if key == "return" or key == "down" then
-        if mode == "run" then
-            --save_ar(2) -- ? save ar comes from the funcs.lua file in the libs folder
-            if ar[#ar - 1] == "/" and ar[#ar] == "l" then
-                ar = {}
-                mode = "file opn"
-            elseif ar[#ar - 1] == "/" and ar[#ar] == "s" then
-                ar = {}
-                mode = "file sav"
-            elseif ar[#ar - 2] == "/" and ar[#ar - 1] == "h" and ar[#ar] == "/" then
-                --love.system.openURL(love.filesystem.getSource().."/html/help.html")
-                love.system.openURL(__HTML__.."/help.html")
-                for i = 1, 3, 1 do
-                    ar[#ar] = nil
-                end
+    if not(#ar-1 < 0 or #ar-1 == 0) then
+        logger.datastack:push("Key pressed "..key.."\n")
+        tmp = 0
+        for i = 1, #ar, 1 do
+            if ar[i] ~= "\n" then
+                tmp = tmp + 1
             else
-                ar[#ar + 1] = "\n"
-                x = 0
-            end
-        else
-            if mode == "file opn" then
-                tmp = ""
-                for i = 1, #ar, 1 do
-                    tmp = tmp..ar[i] -- move everything (ar) into tmp as a string
-                end
-                if not(love.filesystem.getInfo("saves/"..tmp)) then
-                    love.window.showMessageBox("File not found", "File not found: ".."saves/"..tmp, "error")
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                else
-                    -- Open the file and init ar
-                    print("opened: ", tmp)
-                    save("saves/def_save.txt", love.filesystem.read("saves/"..tmp))
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                end
-            end
-            if mode == "file sav" then
-                if ar[1] == "-" and ar[2] == "e" then
-                    tmp = ""
-                    for i = 3, #ar, 1 do
-                        tmp = tmp..ar[i]
-                    end
-                    exportar(tmp)
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                else
-                    tmp = ""
-                    for i = 1, #ar, 1 do
-                        tmp = tmp..ar[i] -- move everything in ar into tmp as a string
-                    end
-                    if not(love.filesystem.getInfo("saves/"..tmp)) then
-                        love.filesystem.newFile("saves/"..tmp)
-                    end
-                    print("saved:", tmp)
-                    save("saves/"..tmp, load("saves/def_save.txt"))
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                end
+                tmp = 0
             end
         end
-    end
-    if key == "backspace" or key == "up" then
-        logger.datastack:push(ar[#ar].." Removed from ar\n")
-        if mode == "run" then
-            --save_ar(0)
-            tmp = 0
-            for i = 1, #ar, 1 do
-                if ar[i] ~= "\n" then
-                    tmp = tmp + 1
-                else
-                    tmp = 0
-                end
-            end
-            if tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
-                if x + 314 * love.timer.getDelta() < 0 then
-                    while tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
-                        x = x + 314 * love.timer.getDelta()
-                        if x > love.graphics.getWidth() then
-                            x = 0
-                            break
-                        end
-                    end
-                else
-                    x = 0
-                end
-            end
-            if not(y == 0) then
-                if ar[#ar] == "\n" then
-                    if y > 0 then
-                        y = 0
-                    else
-                        y = y + 15
-                    end
-                end
+        if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+            while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+                x = x - 314 * love.timer.getDelta()
             end
         end
         ar[#ar] = nil
+        if key == "escape" and mode ~= "run" then
+            mode = "run"
+            ar = {}
+            initar("saves/def_save.txt", false)
+        end
+        if key == "return" or key == "down" then
+            if mode == "run" then
+                --save_ar(2) -- ? save ar comes from the funcs.lua file in the libs folder
+                if ar[#ar - 1] == "/" and ar[#ar] == "l" then
+                    ar = {}
+                    mode = "file opn"
+                elseif ar[#ar - 1] == "/" and ar[#ar] == "s" then
+                    ar = {}
+                    mode = "file sav"
+                elseif ar[#ar - 2] == "/" and ar[#ar - 1] == "h" and ar[#ar] == "/" then
+                    --love.system.openURL(love.filesystem.getSource().."/html/help.html")
+                    love.system.openURL(__HTML__.."/help.html")
+                    for i = 1, 3, 1 do
+                        ar[#ar] = nil
+                    end
+                else
+                    ar[#ar + 1] = "\n"
+                    x = 0
+                end
+            else
+                if mode == "file opn" then
+                    tmp = ""
+                    for i = 1, #ar, 1 do
+                        tmp = tmp..ar[i] -- move everything (ar) into tmp as a string
+                    end
+                    if not(love.filesystem.getInfo("saves/"..tmp)) then
+                        love.window.showMessageBox("File not found", "File not found: ".."saves/"..tmp, "error")
+                        ar = {}
+                        initar("saves/def_save.txt", true)
+                        mode = "run"
+                    else
+                        -- Open the file and init ar
+                        print("opened: ", tmp)
+                        save("saves/def_save.txt", love.filesystem.read("saves/"..tmp))
+                        ar = {}
+                        initar("saves/def_save.txt", true)
+                        mode = "run"
+                    end
+                end
+                if mode == "file sav" then
+                    if ar[1] == "-" and ar[2] == "e" then
+                        tmp = ""
+                        for i = 3, #ar, 1 do
+                            tmp = tmp..ar[i]
+                        end
+                        exportar(tmp)
+                        ar = {}
+                        initar("saves/def_save.txt", true)
+                        mode = "run"
+                    else
+                        tmp = ""
+                        for i = 1, #ar, 1 do
+                            tmp = tmp..ar[i] -- move everything in ar into tmp as a string
+                        end
+                        if not(love.filesystem.getInfo("saves/"..tmp)) then
+                            love.filesystem.newFile("saves/"..tmp)
+                        end
+                        print("saved:", tmp)
+                        save("saves/"..tmp, load("saves/def_save.txt"))
+                        ar = {}
+                        initar("saves/def_save.txt", true)
+                        mode = "run"
+                    end
+                end
+            end
+        end
+        if key == "backspace" or key == "up" then
+            logger.datastack:push(ar[#ar].." Removed from ar\n")
+            if mode == "run" then
+                --save_ar(0)
+                tmp = 0
+                for i = 1, #ar, 1 do
+                    if ar[i] ~= "\n" then
+                        tmp = tmp + 1
+                    else
+                        tmp = 0
+                    end
+                end
+                if tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+                    if x + 314 * love.timer.getDelta() < 0 then
+                        while tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+                            x = x + 314 * love.timer.getDelta()
+                            if x > love.graphics.getWidth() then
+                                x = 0
+                                break
+                            end
+                        end
+                    else
+                        x = 0
+                    end
+                end
+                if not(y == 0) then
+                    if ar[#ar] == "\n" then
+                        if y > 0 then
+                            y = 0
+                        else
+                            y = y + 15
+                        end
+                    end
+                end
+            end
+            ar[#ar] = nil
+        end
+        ar[#ar + 1] = "\b"
+    else
+        logger.datastack:push("keypressed check skipped ar too short\n")
     end
-    ar[#ar + 1] = "\b"
 end
 function love.textinput(key) -- add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
     ar[#ar] = nil
