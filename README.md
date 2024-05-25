@@ -49,10 +49,6 @@ sudo pacman -S love
 cd typer
 ./Linux-run.sh
 ```
-**Fix permission error for ./Linux-run.sh with this command**
-```BASH
-sudo chmod a=rwx ./Linux-run.sh
-```
 ### Windows
 1. Clone the repo
 ```BASH
@@ -87,5 +83,6 @@ sudo pacman -S git
 3. Add Robust error handling...Doing
 4. Make the first Full-Release...Delayed
 ## NOTES
-I currently have no plans to make an installer for MACOS.<br>
-I have yet to determine the Full-Release date
+* I currently have no plans to make an installer for MACOS.<br>
+* I have yet to determine the Full-Release date
+* **Typer runs best with the latest version of LOVE2D(11.5)**
