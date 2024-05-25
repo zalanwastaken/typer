@@ -58,6 +58,7 @@ function save_ar(offset)
     save("saves/def_save.txt", tmp)
     logger.datastack:push("ar saved\n") -- ! logger.lua required for this
 end
+--[[
 function error(errordef)
     local logger = require("libs/logger")
     if __TYPE__ ~= "DEV" or forceerr == true then
@@ -111,6 +112,7 @@ function error(errordef)
         end
     end
 end
+--]]
 function exportar(filename, data)
     local tmp = ""
     ar = {}

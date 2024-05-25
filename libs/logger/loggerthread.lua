@@ -1,5 +1,6 @@
+print("Starting logger")
 require("love.timer")
-local __VER__ = [[1.0.0]]
+local __VER__ = [[TYPER-NO-FR-LOGGER]]
 require("helpers/commons") -- for __TYPE__ var
 if not(love.filesystem.getInfo("logs")) then
     love.filesystem.createDirectory("logs")
@@ -28,6 +29,8 @@ if #love.filesystem.getDirectoryItems("logs") >= 12 then
 end
 love.filesystem.write(file, love.filesystem.read(file).."\nLOGGER VER: "..__VER__.."\n")
 while true do
+    --[[
+        ! TODO: remove this code in future
     if __TYPE__ == "FR-NO-LOG" then
         while true do
             local tmp = datastack:pop()
@@ -37,6 +40,7 @@ while true do
         end
         break
     end
+    --]]
     local data = datastack:pop()
     local tmp, size
     if data ~= nil and data ~= "STOP" and data ~= "FILE" then
@@ -46,12 +50,12 @@ while true do
         else
             error("UNABLE TO READ FILE\nLOGGER ERROR")
         end
-        --print(data)
         if size >= 500000 then --? 500000Bytes = 4 MB
             print("Warning: file is large, read write speed reduced")
         end
     elseif data == "STOP" then
         love.filesystem.write(file, love.filesystem.read(file).."\nLogger stopped")
+        print("Logger stopped")
         break
     else
         love.timer.sleep(0.1)

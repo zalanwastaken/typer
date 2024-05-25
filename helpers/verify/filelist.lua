@@ -2,7 +2,7 @@ local files = { -- list/array of files
     -- /dir
     "main.lua",
     "conf.lua",
-    --"licence.txt",
+    "licence.txt",
     -- /libs dir
     "libs/sav.lua",
     "libs/funcs.lua",

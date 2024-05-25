@@ -29,6 +29,9 @@ function love.load()
     name_image = love.graphics.newImage("data/name.png")
     y = 0 -- the y pos of the draw array
     x = 0 -- the x pos of the draw array
+    if __TYPE__ == "DEV" then
+        debuginfo = false
+    end
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
     ping = love.audio.newSource("data/sounds/ping.mp3", "static")
@@ -68,13 +71,19 @@ function love.load()
         end
     end
     -- ? log some more info
-    local major, minnor, rev, codename = love.getVersion()
-    logger.datastack:push("\nLOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    love_major, love_minnor, love_rev, love_codename = love.getVersion()
+    logger.datastack:push("\nLOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
     logger.datastack:push("\nMade by Zalan(Zalander)")
     logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
 end
 function love.update(dt)
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
+        debuginfo = true
+    end
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("f") and __TYPE__ == "DEV" then
+        debuginfo = false
+    end
     if mode == "run" then
         if (getnewlines(ar, 1) + 3) * 14 - math.abs(y) > love.graphics.getHeight() then
             y = y - 12
@@ -152,6 +161,15 @@ function love.draw()
         if love.keyboard.isDown("lctrl") and mode == "run" and love.keyboard.isDown("s") then
             love.graphics.print("(saved)", love.graphics.getWidth() - 69, love.graphics.getHeight() - 20)
         end
+        if __TYPE__ == "DEV" and debuginfo then
+            love.graphics.setColor(1, 0, 1)
+            love.graphics.print("DEBUG INFO", 0, 0)
+            love.graphics.print("Array length: "..#ar, 0, 12)
+            love.graphics.print("X & Y: "..x.." "..y, 0, 24)
+            love.graphics.print("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.." "..love_codename, 0, 36)
+            love.graphics.print("TYPER VER: "..__VER__.." "..__TYPE__.." Build", 0, 48)
+            love.graphics.setColor(1, 1, 1)
+        end
     else
         love.graphics.setColor(1, 1, 1, opacity)
         opacity = opacity - 3.14 * love.timer.getDelta() -- 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
@@ -166,6 +184,7 @@ function love.draw()
             end
             for i = 1, #files, 1 do
                 if files[i] == nil then
+                    print("BAD FILE IN LOGS")
                     logger.datastack:push("STOP")
                     logger.write:wait()
                     local tmp = love.filesystem.getDirectoryItems("logs")
