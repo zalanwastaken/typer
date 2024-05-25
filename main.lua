@@ -15,6 +15,7 @@ function love.load()
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
+    require("helpers/errorhandler") --* custom error handler
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir

@@ -1,5 +1,6 @@
 --* error handler stuff
 local utf8 = require("utf8")
+local logger = require("libs/logger")
 local function error_printer(msg, layer)
 	print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
 end
@@ -60,6 +61,8 @@ function love.errorhandler(msg)
     local errorpng = love.graphics.newImage("data/err.png")
     local normalfont = love.graphics.newFont(14)
     local bigfont = love.graphics.newFont(19)
+	logger.datastack:push(p.."\n")
+	logger.datastack:push("STOP")
 	local function draw()
 		if not love.graphics.isActive() then return end
 		local pos = 70
