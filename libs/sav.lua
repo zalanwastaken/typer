@@ -28,7 +28,7 @@ function load(filename)
         if not(tmp) then
             error("Unable to create file")
         end
-        tmp = love.filesystem.write(filename, "Type away~ ")
+        tmp = love.filesystem.write(filename, "Hello world !\nThis is Typer "..__VER__)
         if not(tmp) then
             error("Unable to write file")
         end
