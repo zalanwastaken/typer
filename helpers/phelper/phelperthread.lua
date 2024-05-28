@@ -1,10 +1,14 @@
 require("love.timer")
 require("libs/funcs")
+require("helpers/commons")
 love.timer.sleep(1)
 local registry = {}
 local datain = love.thread.getChannel("phelperdatain")
 local dataout = love.thread.getChannel("phelperdataout")
 while true do
+    if __TYPE__ ~= "DEV" then
+        break
+    end
     local data = datain:pop()
     while data do
         local formatted_data = split(data, "_")
@@ -26,8 +30,8 @@ while true do
         elseif formatted_data[1] == "POUT" then
             for i = 1, #registry, 1 do
                 if registry[i][1] == formatted_data[2] then
-                    --io.write("[" .. registry[i][2] .. "]" .. formatted_data[3].."\n")
-                    print("[" .. registry[i][2] .. "]" .. formatted_data[3])
+                    io.write("[" .. registry[i][2] .. "]" .. formatted_data[3].."\n")
+                    --print("[" .. registry[i][2] .. "]" .. formatted_data[3])
                     break
                 end
             end

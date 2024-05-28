@@ -1,9 +1,6 @@
 require("love.timer")
 require("libs/funcs")
 local phelper = require("helpers/phelper")
-if not(phelper.thread:isRunning()) then
-    phelper.thread:start()
-end
 phelper.registy.registerthread(phelper.getfilename())
 print("Starting logger...")
 local __VER__ = [[TYPER-NO-FR-LOGGER]]
