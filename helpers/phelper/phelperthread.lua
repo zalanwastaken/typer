@@ -1,8 +1,9 @@
 require("love.timer")
 require("libs/funcs")
 require("helpers/commons")
+print("Phelper service started...")
 love.timer.sleep(1)
-local registry = {}
+local registry = {} --* phelper registry
 local datain = love.thread.getChannel("phelperdatain")
 local dataout = love.thread.getChannel("phelperdataout")
 while true do
@@ -35,7 +36,10 @@ while true do
                     break
                 end
             end
-        end        
+        elseif formatted_data[1] == "STOP" then
+            print("Phelper service stopped...")
+            break
+        end
         data = datain:pop()
     end
     love.timer.sleep(0.01)  -- Shorter sleep duration

@@ -26,9 +26,14 @@ function love.load()
     set = read("data/settings.json")
     logger.datastack:push("\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
-    name = false
-    timer = 0
-    name_image = love.graphics.newImage("data/name.png")
+    if name then
+        name = false
+        timer = 0
+        name_image = love.graphics.newImage("data/name.png")
+        opacity = 5
+    else
+        name = true
+    end
     y = 0 -- the y pos of the draw array
     x = 0 -- the x pos of the draw array
     if __TYPE__ == "DEV" then
@@ -37,7 +42,6 @@ function love.load()
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
     ping = love.audio.newSource("data/sounds/ping.mp3", "static")
-    opacity = 5
     if __TYPE__ == "DEV" then
         logger.datastack:push("WARNING: This build is configured as DEV !\n")
         love.audio.play(ping)
@@ -399,6 +403,7 @@ function love.quit()
             logger.datastack:push("Aborted saving ar\n")
         end
         logger.datastack:push("STOP")
+        phelper.stop()
         logger.write:wait() -- ? wait for the logger to stop
         return false
     else

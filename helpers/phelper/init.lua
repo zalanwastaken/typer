@@ -35,6 +35,9 @@ local phelper = {
             level = level + 1
         end
         return nil
+    end,
+    stop = function()
+        datain:push("STOP")
     end
 }
 return(phelper)
