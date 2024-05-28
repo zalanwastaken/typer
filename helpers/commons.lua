@@ -1,5 +1,6 @@
 --! This file is runned at startup in the conf.lua file to setup vars that can be accesed from anywhere in the main thread
 require("love.system") --? manually require love.system as this file is runned before its loded internally
+require("helpers/errorhandler") --* custom error handler
 --*common vars
 tmp = 0 --* init tmp (tmp is a general use variable)
 ar = {} --* user input array (ar = array)

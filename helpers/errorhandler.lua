@@ -70,6 +70,7 @@ function love.errorhandler(msg)
         love.graphics.draw(errorpng)
         love.graphics.setFont(bigfont)
         love.graphics.printf("Typer ran into an error that it cant handle !", 0, errorpng:getWidth() + 8, love.graphics.getWidth(), "left")
+		love.graphics.print(__VER__, 4, love.graphics.getHeight() - 20)
         love.graphics.setFont(normalfont)
 		love.graphics.printf(p, 0, errorpng:getWidth() + 27, love.graphics.getWidth(), "left")
 		love.graphics.present()
@@ -82,6 +83,9 @@ function love.errorhandler(msg)
 	end
 	if love.system then
 		p = p .. "\n\nPress Ctrl+C or tap to copy this error"
+	end
+	if not(logger.write:isRunning()) then
+		logger.write:start()
 	end
 	return function()
 		love.event.pump()

@@ -15,7 +15,8 @@ function love.load()
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
-    require("helpers/errorhandler") --* custom error handler
+    phelper = require("helpers/phelper")
+    --require("helpers/errorhandler") --* custom error handler
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir
@@ -77,6 +78,11 @@ function love.load()
     logger.datastack:push("\nMade by Zalan(Zalander)")
     logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
+    phelper.registy.registerfile(phelper.getfilename())
+    phelper.pout(phelper.getfilename(), "LOADING FINISHED")
+    if not(phelper.thread:isRunning()) then
+        phelper.thread:start()
+    end
 end
 function love.update(dt)
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
@@ -101,12 +107,13 @@ function love.update(dt)
         end
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
             ar[#ar] = nil
-            print("Saved "..os.time())
+            --print("Saved "..os.time())
+            phelper.pout(phelper.getfilename(), "Saved ar")
             save_ar(0)
             ar[#ar + 1] = "\b"
         end
     end
-    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") and __TYPE__ == "DEV" then
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and __TYPE__ == "DEV" then
         logger.datastack:push("ERROR INIT BY USER NOT A BUG")
         error("Error init by user")
     end
@@ -359,6 +366,10 @@ function love.keypressed(key)
             end
             ar[#ar] = nil
         end
+        ar[#ar + 1] = "\b"
+    elseif key == "return" then
+        ar[#ar] = nil
+        ar[#ar + 1] = "\n"
         ar[#ar + 1] = "\b"
     else
         logger.datastack:push("keypressed check skipped ar too short\n")

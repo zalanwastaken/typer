@@ -1,4 +1,4 @@
-local files = { -- list/array of files 
+local files = { --? list/array of files 
     -- /dir
     "main.lua",
     "conf.lua",
@@ -21,6 +21,7 @@ local files = { -- list/array of files
     "html/images/icon.png",
     "html/help.html",
     -- /helpers dir
-    "helpers/commons.lua"
+    "helpers/commons.lua",
+    "helpers/errorhandler.lua"
 }
 return(files)

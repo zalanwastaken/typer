@@ -12,7 +12,7 @@ function love.conf(t)
     if __TYPE__== "DEV" then
         t.window.title = "DEV BUILD "..__VER__
     else
-        t.window.title = __VER__ -- * set the window title
+        t.window.title = "Typer "..__VER__ -- * set the window title
     end
     t.window.resizable = true -- * make the window resizeable
     love.setDeprecationOutput(false) -- ! Probably not a good idea

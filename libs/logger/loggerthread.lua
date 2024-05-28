@@ -1,5 +1,11 @@
-print("Starting logger")
 require("love.timer")
+require("libs/funcs")
+local phelper = require("helpers/phelper")
+if not(phelper.thread:isRunning()) then
+    phelper.thread:start()
+end
+phelper.registy.registerthread(phelper.getfilename())
+print("Starting logger...")
 local __VER__ = [[TYPER-NO-FR-LOGGER]]
 require("helpers/commons") -- for __TYPE__ var
 if not(love.filesystem.getInfo("logs")) then
@@ -29,24 +35,13 @@ if #love.filesystem.getDirectoryItems("logs") >= 12 then
 end
 love.filesystem.write(file, love.filesystem.read(file).."\nLOGGER VER: "..__VER__.."\n")
 while true do
-    --[[
-        ! TODO: remove this code in future
-    if __TYPE__ == "FR-NO-LOG" then
-        while true do
-            local tmp = datastack:pop()
-            if tmp == nil then
-                break
-            end
-        end
-        break
-    end
-    --]]
     local data = datastack:pop()
     local tmp, size
-    if data ~= nil and data ~= "STOP" and data ~= "FILE" then
+    if data ~= nil and data ~= "STOP" then
         tmp, size = love.filesystem.read(file)
         if tmp ~= nil then
             love.filesystem.write(file, tmp.."["..(os.date()).."] "..data)
+            phelper.pout(phelper.getfilename(), "["..(os.date()).."] "..data)
         else
             error("UNABLE TO READ FILE\nLOGGER ERROR")
         end
@@ -54,8 +49,9 @@ while true do
             print("Warning: file is large, read write speed reduced")
         end
     elseif data == "STOP" then
+        phelper.registy.unregister(phelper.getfilename())
         love.filesystem.write(file, love.filesystem.read(file).."\nLogger stopped")
-        print("Logger stopped")
+        print("Logger stopped...")
         break
     else
         love.timer.sleep(0.1)

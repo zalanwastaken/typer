@@ -1,27 +1,4 @@
 print("Starting verification...")
-local function error(errordef)
-    print("Error: "..errordef)
-    local fnt = love.graphics.newFont(20)
-    function love.draw()
-        love.graphics.setFont(fnt)
-        love.graphics.setBackgroundColor(0, 0, 1)
-        love.graphics.printf(errordef, 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), "center")
-        if __VER__ ~= nil then
-            love.graphics.print(__VER__, 5, love.graphics.getHeight() - 20)
-        else
-            love.graphics.print("Unable to determine.", 5, love.graphics.getHeight() - 20)
-        end
-    end
-    function love.update(dt)
-        -- do nothing
-    end
-    function love.textinput(key)
-        -- do nothing
-    end
-    function love.quit()
-        return false
-    end
-end
 if not(love.filesystem.getInfo("html")) then
     if love.filesystem.getInfo("html-template") then
         local template = "html-template"
@@ -40,19 +17,28 @@ if not(love.filesystem.getInfo("html")) then
         end
         for i = 1, #html_template, 1 do
             local tmp = love.filesystem.read(template.."/"..html_template[i])
-            print(html_template[i])
+            print("Setting up..."..html_template[i])
             if tmp ~= nil then
-                love.filesystem.write(root.."/"..html_template[i], tmp)
+                local success, two = love.filesystem.write(root.."/"..html_template[i], tmp)
+                if success then
+                    print("Succesfully setup..."..html_template[i])
+                else
+                    print(success, two)
+                    error(success.."\n"..two)
+                end
             else
                 tmp = love.filesystem.read(html_template[i])
-                --print(tmp)
                 local success, two = love.filesystem.write(root.."/"..html_template[i], tmp)
-                print(success, two)
+                if success then
+                    print("Succesfully setup..."..html_template[i])
+                else
+                    print(success, two)
+                    error(success.."\n"..two)
+                end
             end
         end
     else
         error("Html template not found") --* setup a error
-        return 1 --? terminate the exicution of this file
     end
 end
 local htmlverifythread = love.thread.newThread([[

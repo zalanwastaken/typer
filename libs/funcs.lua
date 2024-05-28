@@ -134,3 +134,11 @@ function removeCharsKeepNumbers(str)
     local result = str:gsub("[^%d]+", "")
     return result
 end
+function split(input, delimiter)
+    local result = {}
+    local pattern = "([^" .. delimiter .. "]+)"
+    for word in string.gmatch(input, pattern) do
+        table.insert(result, word)
+    end
+    return result
+end
