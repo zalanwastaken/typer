@@ -1,4 +1,4 @@
-require("libs/funcs") -- edited for this project
+require("libs/funcs") --NOTE: edited for this project
 --TODO replace love file operations with io file operations
 function save(filename, data)
     if love.filesystem.getInfo(filename) then

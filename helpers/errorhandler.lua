@@ -31,7 +31,9 @@ function love.errorhandler(msg)
 			v:setVibration()
 		end
 	end
-	if love.audio then love.audio.stop() end
+	if love.audio then 
+		love.audio.stop() 
+	end
 	love.graphics.reset()
 	local font = love.graphics.setNewFont(14)
 	love.graphics.setColor(1, 1, 1)
@@ -58,12 +60,25 @@ function love.errorhandler(msg)
 	local p = table.concat(err, "\n")
 	p = p:gsub("\t", "")
 	p = p:gsub("%[string \"(.-)\"%]", "%1")
+	local fullErrorText = p
+	local function copyToClipboard()
+		if not love.system then return end
+		love.system.setClipboardText(fullErrorText)
+		p = p .. "\nCopied to clipboard!"
+	end
+	if love.system then
+		p = p .. "\n\nPress Ctrl+C or tap to copy this error"
+	end
+	--* My code
     local errorpng = love.graphics.newImage("data/err.png")
     local normalfont = love.graphics.newFont(14)
     local bigfont = love.graphics.newFont(19)
 	logger.datastack:push(p.."\n")
 	logger.datastack:push("STOP")
-	local function draw()
+	if not(logger.write:isRunning()) then
+		logger.write:start()
+	end
+	local function draw() --* the draw function
 		if not love.graphics.isActive() then return end
 		local pos = 70
 		love.graphics.clear(0, 0, 1, 1)
@@ -74,18 +89,6 @@ function love.errorhandler(msg)
         love.graphics.setFont(normalfont)
 		love.graphics.printf(p, 0, errorpng:getWidth() + 27, love.graphics.getWidth(), "left")
 		love.graphics.present()
-	end
-	local fullErrorText = p
-	local function copyToClipboard()
-		if not love.system then return end
-		love.system.setClipboardText(fullErrorText)
-		p = p .. "\nCopied to clipboard!"
-	end
-	if love.system then
-		p = p .. "\n\nPress Ctrl+C or tap to copy this error"
-	end
-	if not(logger.write:isRunning()) then
-		logger.write:start()
 	end
 	return function()
 		love.event.pump()

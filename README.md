@@ -5,7 +5,7 @@
 ## Why typer ?
 1) 100% Open Source and Free 📦
 2) Fast and Lightweight (<1MB) 🔥
-3) Because why not? 😺
+3) Why not ? 🐱
 ## Read html/help.html for help :D<br>
 ## How to install
 ### Linux

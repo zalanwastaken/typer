@@ -15,8 +15,6 @@ function love.load()
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
-    phelper = require("helpers/phelper")
-    --require("helpers/errorhandler") --* custom error handler
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir
@@ -34,8 +32,8 @@ function love.load()
     else
         name = true
     end
-    y = 0 -- the y pos of the draw array
-    x = 0 -- the x pos of the draw array
+    y = 0 --* the y pos of the draw array
+    x = 0 --* the x pos of the draw array
     if __TYPE__ == "DEV" then
         debuginfo = false
     end
@@ -82,11 +80,6 @@ function love.load()
     logger.datastack:push("\nMade by Zalan(Zalander)")
     logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
-    phelper.registy.registerfile(phelper.getfilename())
-    phelper.pout(phelper.getfilename(), "LOADING FINISHED")
-    if not(phelper.thread:isRunning()) then
-        phelper.thread:start()
-    end
 end
 function love.update(dt)
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
@@ -112,7 +105,7 @@ function love.update(dt)
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
             ar[#ar] = nil
             --print("Saved "..os.time())
-            phelper.pout(phelper.getfilename(), "Saved ar")
+            logger.datastack:push("User saved ar\n")
             save_ar(0)
             ar[#ar + 1] = "\b"
         end
@@ -403,7 +396,6 @@ function love.quit()
             logger.datastack:push("Aborted saving ar\n")
         end
         logger.datastack:push("STOP")
-        phelper.stop()
         logger.write:wait() -- ? wait for the logger to stop
         return false
     else
@@ -411,9 +403,4 @@ function love.quit()
         return true
     end
 end
---[[
-    * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
-    ! BTW dont steal my code because that would be bad :( (You can use it but pls mention that it was modified and dont claim to be the owner of Typer)
-    ? Fun fact Typer was never ment to be Open sourse heck it wasent even ment to be public
-    ? Oh and i used to write these massages as comments at the end of the main.lua file when i was really new to coding
---]]
+--* Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
