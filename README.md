@@ -1,6 +1,7 @@
 # Typer<br>
 **DM me for better name ideas :|**
 ## A text editor made with LOVE2D.<br>
+# ATTENTION !: TYPER IS NOW LICENCED UNDER ZLIB INSTEAD TO MIT ZERO ATTRUBTUION
 **[LOVE2D](https://love2d.org/) is required to run this project**
 ## Why typer ?
 1) 100% Open Source and Free 📦
