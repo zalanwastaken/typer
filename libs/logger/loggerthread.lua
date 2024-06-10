@@ -36,6 +36,7 @@ while true do
         tmp, size = love.filesystem.read(file)
         if tmp ~= nil then
             love.filesystem.write(file, tmp.."["..(os.date()).."] "..data)
+            print("[LOGGER/"..(os.date()).."] "..data)
         else
             error("UNABLE TO READ FILE\nLOGGER ERROR")
         end
