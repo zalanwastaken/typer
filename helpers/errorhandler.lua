@@ -79,7 +79,9 @@ function love.errorhandler(msg)
 		logger.write:start()
 	end
 	local function draw() --* the draw function
-		if not love.graphics.isActive() then return end
+		if not(love.graphics.isActive()) then
+			return --? exit if love.graphics is not active
+		end
 		local pos = 70
 		love.graphics.clear(0, 0, 1, 1)
         love.graphics.draw(errorpng)

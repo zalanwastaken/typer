@@ -15,6 +15,7 @@ function love.load()
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
+    commands = require("data/commands") -- commands and their functions
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir
@@ -117,23 +118,20 @@ function love.update(dt)
     if love.keyboard.isDown("escape") then
         love.event.quit(0)
     end
+    if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
+        mode = "cmdplt"
+        save_ar(1)
+        ar = {"\b"}
+    end
 end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     if name then
         love.graphics.setColor(1, 1, 1, 1)
-        if getnewlines(ar, 1) > 100 then
-            if set[2] == "true" then
-                love.graphics.printf(ar, x + 32, y, love.graphics.getWidth())
-            else
-                love.graphics.print(ar, x + 32, y)
-            end
-        else
-            if set[2] == "true" then
-                love.graphics.printf(ar, x + 20, y, love.graphics.getWidth())
-            else
-                love.graphics.print(ar, x + 20, y)
-            end
+        if getnewlines(ar, 1) > 100 and mode ~= "cmdplt" then
+            love.graphics.print(ar, x + 32, y)
+        elseif mode ~= "cmdplt" then
+            love.graphics.print(ar, x + 20, y)
         end
         for i = 0, getnewlines(ar, 1), 1 do
             love.graphics.print(i, 0, i * 14 + y)
@@ -146,6 +144,7 @@ function love.draw()
         end
         if mode == "run" then
             love.graphics.print("Press CTRL + s to save", 12 * 36, love.graphics.getHeight() - 20)
+        --[[ --? Dont need this code for now
         elseif mode == "file opn" then
             love.graphics.print("This is load mode enter filename to be loaded", 12 * 36, love.graphics.getHeight() - 20)
             tmp = love.filesystem.getDirectoryItems("saves/")
@@ -162,6 +161,34 @@ function love.draw()
                 love.graphics.print(tmp[i], ((i - 1)* 12) * #tmp[i], (love.graphics.getHeight() / 2 )+ 12) 
             end
             love.graphics.rectangle("line", 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), love.graphics.getHeight() / 2)
+        --]]
+        elseif mode == "cmdplt" then
+            love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 90, (love.graphics.getHeight() / 2) - 50, 180, 100)
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 80, (love.graphics.getHeight() / 2) - 40, 160, 80)
+            love.graphics.setColor(1, 1, 1)
+            if #ar <= 1 then
+                love.graphics.print("Command palette", (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
+            else
+                love.graphics.print(ar, (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
+            end
+            if love.keyboard.isDown("return") then
+                local tmp = ""
+                for i = 1, #ar-1, 1 do
+                    tmp = tmp..ar[i]
+                end
+                local cmd = split(tmp, " ")
+                tmp = nil
+                if commands[cmd[1]] ~= nil then
+                    commands[cmd[1]]()
+                else
+                    love.window.showMessageBox("Error", "Command not found !", "info")
+                end
+            end
+            if (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
+                initar("saves/def_save.txt", true)
+                mode = "run"
+            end
         end
         if love.keyboard.isDown("lctrl") and mode == "run" and love.keyboard.isDown("s") then
             love.graphics.print("(saved)", love.graphics.getWidth() - 69, love.graphics.getHeight() - 20)

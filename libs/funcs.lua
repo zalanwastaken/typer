@@ -23,40 +23,26 @@ function gettnewlinesstring(str)
     return newlineCount
 end
 function initar(file, add)
-    tmp = load(file)
+    tmp = love.filesystem.read(file)
     for i = 1, #tmp, 1 do
         ar[i] = tmp:sub(i, i)
-    end
-    for i = 1, #ar, 1 do
-        if ar[i] == "/" and ar[i + 1] == "n" then
-            ar[i] = "\n"
-            for i = i + 2, #ar, 1 do
-                ar[i - 1] = ar[i]
-                if i == #ar then
-                    ar[i] = nil
-                end
-            end
-        end
     end
     if add then
         ar[#ar + 1] = "\b"
     end
-    if ar[#ar - 1] == "n" then
-        ar[#ar - 1] = ""
+    if logger then
+        logger.datastack:push("ar init from "..file.."\n") -- ! logger.lua is required for this
     end
-    logger.datastack:push("ar init from "..file.."\n") -- ! logger.lua is required for this
 end
 function save_ar(offset)
-    tmp = ""
+    local tmp = ""
     for i = 1, #ar - offset, 1 do
-            if ar[i] == "\n" then
-            tmp = tmp.."/n"
-        else
-            tmp = tmp..ar[i]
-        end
+        tmp = tmp..ar[i]
     end
-    save("saves/def_save.txt", tmp)
-    logger.datastack:push("ar saved\n") -- ! logger.lua required for this
+    love.filesystem.write("saves/def_save.txt", tmp)
+    if logger then
+        logger.datastack:push("ar saved\n")
+    end
 end
 function exportar(filename, data)
     local tmp = ""
@@ -81,7 +67,7 @@ function removeCharsKeepNumbers(str)
 end
 function split(input, delimiter)
     local result = {}
-    local pattern = "([^" .. delimiter .. "]+)"
+    local pattern = "([^"..delimiter.."]+)"
     for word in string.gmatch(input, pattern) do
         table.insert(result, word)
     end

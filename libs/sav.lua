@@ -8,9 +8,9 @@ function save(filename, data)
         if not(tmp) then
             error("Unable to create file")
         end
-        tmp = love.filesystem.write(filename, data)
+        tmp, err = love.filesystem.write(filename, data)
         if not(tmp) then
-            error("Unable to write file")
+            error("Unable to write file\n"..err)
         end
     end
 end
@@ -28,9 +28,9 @@ function load(filename)
         if not(tmp) then
             error("Unable to create file")
         end
-        tmp = love.filesystem.write(filename, "Hello world !\nThis is Typer "..__VER__)
+        tmp, err = love.filesystem.write(filename, "Hello world !\nThis is Typer "..__VER__)
         if not(tmp) then
-            error("Unable to write file")
+            error("Unable to write file\n"..err)
         end
         tmp = love.filesystem.read(filename)
         if not(tmp) then
