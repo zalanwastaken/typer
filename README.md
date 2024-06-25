@@ -1,4 +1,4 @@
-# ATTENTION !: NOW VERSIONS OF TYPER ARE DEVELOPED UNDER A NEW LICENCE PLEASE CHECK licence.txt !<br>
+# ATTENTION !: NEW VERSIONS OF TYPER ARE DEVELOPED UNDER A NEW LICENCE PLEASE CHECK licence.txt !<br>
 # Typer<br>
 **DM me for better name ideas :|**
 ## A text editor made with LOVE2D.<br>
