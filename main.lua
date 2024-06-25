@@ -25,7 +25,7 @@ function love.load()
     set = read("data/settings.json")
     logger.datastack:push("\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
-    if name then
+    if not(skipname) then
         name = false
         timer = 0
         name_image = love.graphics.newImage("data/name.png")
@@ -180,7 +180,7 @@ function love.draw()
                 local cmd = split(tmp, " ")
                 tmp = nil
                 if commands[cmd[1]] ~= nil then
-                    commands[cmd[1]]()
+                    commands[cmd[1]](cmd)
                 else
                     love.window.showMessageBox("Error", "Command not found !", "info")
                 end
@@ -206,7 +206,7 @@ function love.draw()
         love.graphics.setColor(1, 1, 1, opacity)
         opacity = opacity - 3.14 * love.timer.getDelta() -- 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
         timer = timer + 10 * love.timer.getDelta()
-        love.graphics.draw(name_image, (love.graphics.getWidth() / 1.5) - name_image:getWidth(), (love.graphics.getHeight() / 1.5) - name_image:getHeight())
+        love.graphics.draw(name_image, (love.graphics.getWidth()) - name_image:getWidth(), (love.graphics.getHeight()) - name_image:getHeight())
         if __TYPE__ == "DEV" then
             local x = 0
             local y = 0
@@ -289,68 +289,8 @@ function love.keypressed(key)
         end
         if key == "return" or key == "down" then
             if mode == "run" then
-                --save_ar(2) -- ? save ar comes from the funcs.lua file in the libs folder
-                if ar[#ar - 1] == "/" and ar[#ar] == "l" then
-                    ar = {}
-                    mode = "file opn"
-                elseif ar[#ar - 1] == "/" and ar[#ar] == "s" then
-                    ar = {}
-                    mode = "file sav"
-                elseif ar[#ar - 2] == "/" and ar[#ar - 1] == "h" and ar[#ar] == "/" then
-                    --love.system.openURL(love.filesystem.getSource().."/html/help.html")
-                    love.system.openURL(__HTML__.."/help.html")
-                    for i = 1, 3, 1 do
-                        ar[#ar] = nil
-                    end
-                else
-                    ar[#ar + 1] = "\n"
-                    x = 0
-                end
-            else
-                if mode == "file opn" then
-                    tmp = ""
-                    for i = 1, #ar, 1 do
-                        tmp = tmp..ar[i] -- move everything (ar) into tmp as a string
-                    end
-                    if not(love.filesystem.getInfo("saves/"..tmp)) then
-                        love.window.showMessageBox("File not found", "File not found: ".."saves/"..tmp, "error")
-                        ar = {}
-                        initar("saves/def_save.txt", true)
-                        mode = "run"
-                    else
-                        -- Open the file and init ar
-                        print("opened: ", tmp)
-                        save("saves/def_save.txt", love.filesystem.read("saves/"..tmp))
-                        ar = {}
-                        initar("saves/def_save.txt", true)
-                        mode = "run"
-                    end
-                end
-                if mode == "file sav" then
-                    if ar[1] == "-" and ar[2] == "e" then
-                        tmp = ""
-                        for i = 3, #ar, 1 do
-                            tmp = tmp..ar[i]
-                        end
-                        exportar(tmp)
-                        ar = {}
-                        initar("saves/def_save.txt", true)
-                        mode = "run"
-                    else
-                        tmp = ""
-                        for i = 1, #ar, 1 do
-                            tmp = tmp..ar[i] -- move everything in ar into tmp as a string
-                        end
-                        if not(love.filesystem.getInfo("saves/"..tmp)) then
-                            love.filesystem.newFile("saves/"..tmp)
-                        end
-                        print("saved:", tmp)
-                        save("saves/"..tmp, load("saves/def_save.txt"))
-                        ar = {}
-                        initar("saves/def_save.txt", true)
-                        mode = "run"
-                    end
-                end
+                ar[#ar + 1] = "\n"
+                x = 0
             end
         end
         if key == "backspace" or key == "up" then

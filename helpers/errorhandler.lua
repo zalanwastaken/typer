@@ -73,11 +73,11 @@ function love.errorhandler(msg)
     local errorpng = love.graphics.newImage("data/err.png")
     local normalfont = love.graphics.newFont(14)
     local bigfont = love.graphics.newFont(19)
-	logger.datastack:push(p.."\n")
-	logger.datastack:push("STOP")
 	if not(logger.write:isRunning()) then
 		logger.write:start()
 	end
+	logger.datastack:push(p.."\n")
+	logger.datastack:push("STOP")
 	local function draw() --* the draw function
 		if not(love.graphics.isActive()) then
 			return --? exit if love.graphics is not active
@@ -92,7 +92,7 @@ function love.errorhandler(msg)
 		love.graphics.printf(p, 0, errorpng:getWidth() + 27, love.graphics.getWidth(), "left")
 		love.graphics.present()
 	end
-	return function()
+	return(function()
 		love.event.pump()
 		for e, a, b, c in love.event.poll() do
 			if e == "quit" then
@@ -120,5 +120,5 @@ function love.errorhandler(msg)
 		if love.timer then
 			love.timer.sleep(0.1)
 		end
-	end
+	end)
 end
