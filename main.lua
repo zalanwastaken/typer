@@ -15,6 +15,7 @@ function love.load()
     require("libs/sav") -- save library
     require("libs/funcs") -- functions
     require("libs/jsonlib") -- json library
+    commands = require("data/commands") -- commands and their functions
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir
@@ -24,15 +25,22 @@ function love.load()
     set = read("data/settings.json")
     logger.datastack:push("\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
-    name = false
-    timer = 0
-    name_image = love.graphics.newImage("data/name.png")
-    y = 0 -- the y pos of the draw array
-    x = 0 -- the x pos of the draw array
+    if not(skipname) then
+        name = false
+        timer = 0
+        name_image = love.graphics.newImage("data/name.png")
+        opacity = 5
+    else
+        name = true
+    end
+    y = 0 --* the y pos of the draw array
+    x = 0 --* the x pos of the draw array
+    if __TYPE__ == "DEV" then
+        debuginfo = false
+    end
     fnt = love.graphics.newFont(12) -- font for the program (create here not set)
     love.graphics.setFont(fnt) -- set the font
     ping = love.audio.newSource("data/sounds/ping.mp3", "static")
-    opacity = 5
     if __TYPE__ == "DEV" then
         logger.datastack:push("WARNING: This build is configured as DEV !\n")
         love.audio.play(ping)
@@ -68,13 +76,19 @@ function love.load()
         end
     end
     -- ? log some more info
-    local major, minnor, rev, codename = love.getVersion()
-    logger.datastack:push("\nLOVE2D VER: "..major.."."..minnor.."."..rev.."\n".."LOVE2D CODENAME: "..codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    love_major, love_minnor, love_rev, love_codename = love.getVersion()
+    logger.datastack:push("\nLOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
     logger.datastack:push("\nMade by Zalan(Zalander)")
     logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
     logger.write:start()
 end
 function love.update(dt)
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
+        debuginfo = true
+    end
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("f") and __TYPE__ == "DEV" then
+        debuginfo = false
+    end
     if mode == "run" then
         if (getnewlines(ar, 1) + 3) * 14 - math.abs(y) > love.graphics.getHeight() then
             y = y - 12
@@ -91,35 +105,33 @@ function love.update(dt)
         end
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
             ar[#ar] = nil
-            print("Saved "..os.time())
+            --print("Saved "..os.time())
+            logger.datastack:push("User saved ar\n")
             save_ar(0)
             ar[#ar + 1] = "\b"
         end
     end
-    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and love.keyboard.isDown("lalt") and __TYPE__ == "DEV" then
+    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and __TYPE__ == "DEV" then
         logger.datastack:push("ERROR INIT BY USER NOT A BUG")
         error("Error init by user")
     end
     if love.keyboard.isDown("escape") then
         love.event.quit(0)
     end
+    if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
+        mode = "cmdplt"
+        save_ar(1)
+        ar = {"\b"}
+    end
 end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     if name then
         love.graphics.setColor(1, 1, 1, 1)
-        if getnewlines(ar, 1) > 100 then
-            if set[2] == "true" then
-                love.graphics.printf(ar, x + 32, y, love.graphics.getWidth())
-            else
-                love.graphics.print(ar, x + 32, y)
-            end
-        else
-            if set[2] == "true" then
-                love.graphics.printf(ar, x + 20, y, love.graphics.getWidth())
-            else
-                love.graphics.print(ar, x + 20, y)
-            end
+        if getnewlines(ar, 1) > 100 and mode ~= "cmdplt" then
+            love.graphics.print(ar, x + 32, y)
+        elseif mode ~= "cmdplt" then
+            love.graphics.print(ar, x + 20, y)
         end
         for i = 0, getnewlines(ar, 1), 1 do
             love.graphics.print(i, 0, i * 14 + y)
@@ -132,6 +144,7 @@ function love.draw()
         end
         if mode == "run" then
             love.graphics.print("Press CTRL + s to save", 12 * 36, love.graphics.getHeight() - 20)
+        --[[ --? Dont need this code for now
         elseif mode == "file opn" then
             love.graphics.print("This is load mode enter filename to be loaded", 12 * 36, love.graphics.getHeight() - 20)
             tmp = love.filesystem.getDirectoryItems("saves/")
@@ -148,15 +161,52 @@ function love.draw()
                 love.graphics.print(tmp[i], ((i - 1)* 12) * #tmp[i], (love.graphics.getHeight() / 2 )+ 12) 
             end
             love.graphics.rectangle("line", 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), love.graphics.getHeight() / 2)
+        --]]
+        elseif mode == "cmdplt" then
+            love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 90, (love.graphics.getHeight() / 2) - 50, 180, 100)
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 80, (love.graphics.getHeight() / 2) - 40, 160, 80)
+            love.graphics.setColor(1, 1, 1)
+            if #ar <= 1 then
+                love.graphics.print("Command palette", (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
+            else
+                love.graphics.print(ar, (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
+            end
+            if love.keyboard.isDown("return") then
+                local tmp = ""
+                for i = 1, #ar-1, 1 do
+                    tmp = tmp..ar[i]
+                end
+                local cmd = split(tmp, " ")
+                tmp = nil
+                if commands[cmd[1]] ~= nil then
+                    commands[cmd[1]](cmd)
+                else
+                    love.window.showMessageBox("Error", "Command not found !", "info")
+                end
+            end
+            if (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
+                initar("saves/def_save.txt", true)
+                mode = "run"
+            end
         end
         if love.keyboard.isDown("lctrl") and mode == "run" and love.keyboard.isDown("s") then
             love.graphics.print("(saved)", love.graphics.getWidth() - 69, love.graphics.getHeight() - 20)
+        end
+        if __TYPE__ == "DEV" and debuginfo then
+            love.graphics.setColor(1, 0, 1)
+            love.graphics.print("DEBUG INFO", 0, 0)
+            love.graphics.print("Array length: "..#ar, 0, 12)
+            love.graphics.print("X & Y: "..x.." "..y, 0, 24)
+            love.graphics.print("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.." "..love_codename, 0, 36)
+            love.graphics.print("TYPER VER: "..__VER__.." "..__TYPE__.." Build", 0, 48)
+            love.graphics.setColor(1, 1, 1)
         end
     else
         love.graphics.setColor(1, 1, 1, opacity)
         opacity = opacity - 3.14 * love.timer.getDelta() -- 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
         timer = timer + 10 * love.timer.getDelta()
-        love.graphics.draw(name_image, (love.graphics.getWidth() / 1.5) - name_image:getWidth(), (love.graphics.getHeight() / 1.5) - name_image:getHeight())
+        love.graphics.draw(name_image, (love.graphics.getWidth()) - name_image:getWidth(), (love.graphics.getHeight()) - name_image:getHeight())
         if __TYPE__ == "DEV" then
             local x = 0
             local y = 0
@@ -166,6 +216,7 @@ function love.draw()
             end
             for i = 1, #files, 1 do
                 if files[i] == nil then
+                    print("BAD FILE IN LOGS")
                     logger.datastack:push("STOP")
                     logger.write:wait()
                     local tmp = love.filesystem.getDirectoryItems("logs")
@@ -215,130 +266,78 @@ function love.draw()
     end
 end
 function love.keypressed(key)
-    logger.datastack:push("Key pressed "..key.."\n")
-    tmp = 0
-    for i = 1, #ar, 1 do
-        if ar[i] ~= "\n" then
-            tmp = tmp + 1
-        else
-            tmp = 0
-        end
-    end
-    if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
-        while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
-            x = x - 314 * love.timer.getDelta()
-        end
-    end
-    ar[#ar] = nil
-    if key == "escape" and mode ~= "run" then
-        mode = "run"
-        ar = {}
-        initar("saves/def_save.txt", false)
-    end
-    if key == "return" or key == "down" then
-        if mode == "run" then
-            --save_ar(2) -- ? save ar comes from the funcs.lua file in the libs folder
-            if ar[#ar - 1] == "/" and ar[#ar] == "l" then
-                ar = {}
-                mode = "file opn"
-            elseif ar[#ar - 1] == "/" and ar[#ar] == "s" then
-                ar = {}
-                mode = "file sav"
-            elseif ar[#ar - 2] == "/" and ar[#ar - 1] == "h" and ar[#ar] == "/" then
-                --love.system.openURL(love.filesystem.getSource().."/html/help.html")
-                love.system.openURL(__HTML__.."/help.html")
-                for i = 1, 3, 1 do
-                    ar[#ar] = nil
-                end
+    if not(#ar-1 < 0 or #ar-1 == 0) then
+        logger.datastack:push("Key pressed "..key.."\n")
+        tmp = 0
+        for i = 1, #ar, 1 do
+            if ar[i] ~= "\n" then
+                tmp = tmp + 1
             else
-                ar[#ar + 1] = "\n"
-                x = 0
-            end
-        else
-            if mode == "file opn" then
-                tmp = ""
-                for i = 1, #ar, 1 do
-                    tmp = tmp..ar[i] -- move everything (ar) into tmp as a string
-                end
-                if not(love.filesystem.getInfo("saves/"..tmp)) then
-                    love.window.showMessageBox("File not found", "File not found: ".."saves/"..tmp, "error")
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                else
-                    -- Open the file and init ar
-                    print("opened: ", tmp)
-                    save("saves/def_save.txt", love.filesystem.read("saves/"..tmp))
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                end
-            end
-            if mode == "file sav" then
-                if ar[1] == "-" and ar[2] == "e" then
-                    tmp = ""
-                    for i = 3, #ar, 1 do
-                        tmp = tmp..ar[i]
-                    end
-                    exportar(tmp)
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                else
-                    tmp = ""
-                    for i = 1, #ar, 1 do
-                        tmp = tmp..ar[i] -- move everything in ar into tmp as a string
-                    end
-                    if not(love.filesystem.getInfo("saves/"..tmp)) then
-                        love.filesystem.newFile("saves/"..tmp)
-                    end
-                    print("saved:", tmp)
-                    save("saves/"..tmp, load("saves/def_save.txt"))
-                    ar = {}
-                    initar("saves/def_save.txt", true)
-                    mode = "run"
-                end
+                tmp = 0
             end
         end
-    end
-    if key == "backspace" or key == "up" then
-        logger.datastack:push(ar[#ar].." Removed from ar\n")
-        if mode == "run" then
-            --save_ar(0)
-            tmp = 0
-            for i = 1, #ar, 1 do
-                if ar[i] ~= "\n" then
-                    tmp = tmp + 1
-                else
-                    tmp = 0
-                end
-            end
-            if tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
-                if x + 314 * love.timer.getDelta() < 0 then
-                    while tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
-                        x = x + 314 * love.timer.getDelta()
-                        if x > love.graphics.getWidth() then
-                            x = 0
-                            break
-                        end
-                    end
-                else
-                    x = 0
-                end
-            end
-            if not(y == 0) then
-                if ar[#ar] == "\n" then
-                    if y > 0 then
-                        y = 0
-                    else
-                        y = y + 15
-                    end
-                end
+        if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+            while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+                x = x - 314 * love.timer.getDelta()
             end
         end
         ar[#ar] = nil
+        if key == "escape" and mode ~= "run" then
+            mode = "run"
+            ar = {}
+            initar("saves/def_save.txt", false)
+        end
+        if key == "return" or key == "down" then
+            if mode == "run" then
+                ar[#ar + 1] = "\n"
+                x = 0
+            end
+        end
+        if key == "backspace" or key == "up" then
+            logger.datastack:push(ar[#ar].." Removed from ar\n")
+            if mode == "run" then
+                --save_ar(0)
+                tmp = 0
+                for i = 1, #ar, 1 do
+                    if ar[i] ~= "\n" then
+                        tmp = tmp + 1
+                    else
+                        tmp = 0
+                    end
+                end
+                if tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
+                    if x + 314 * love.timer.getDelta() < 0 then
+                        while tmp * 12 - math.abs(x * 1.5) < love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
+                            x = x + 314 * love.timer.getDelta()
+                            if x > love.graphics.getWidth() then
+                                x = 0
+                                break
+                            end
+                        end
+                    else
+                        x = 0
+                    end
+                end
+                if not(y == 0) then
+                    if ar[#ar] == "\n" then
+                        if y > 0 then
+                            y = 0
+                        else
+                            y = y + 15
+                        end
+                    end
+                end
+            end
+            ar[#ar] = nil
+        end
+        ar[#ar + 1] = "\b"
+    elseif key == "return" then
+        ar[#ar] = nil
+        ar[#ar + 1] = "\n"
+        ar[#ar + 1] = "\b"
+    else
+        logger.datastack:push("keypressed check skipped ar too short\n")
     end
-    ar[#ar + 1] = "\b"
 end
 function love.textinput(key) -- add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
     ar[#ar] = nil
@@ -371,9 +370,4 @@ function love.quit()
         return true
     end
 end
---[[
-    * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
-    ! BTW dont steal my code because that would be bad :( (You can use it but pls mention that it was modified and dont claim to be the owner of Typer)
-    ? Fun fact Typer was never ment to be Open sourse heck it wasent even ment to be public
-    ? Oh and i used to write these massages as comments at the end of the main.lua file when i was really new to coding
---]]
+--* Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
