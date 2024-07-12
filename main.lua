@@ -12,18 +12,25 @@ function love.load()
         error("We are currently unable to verify interigrity for the safety of your data this programwill now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
     logger = require("libs/logger")
-    require("libs/sav") -- save library
-    require("libs/funcs") -- functions
-    require("libs/jsonlib") -- json library
-    commands = require("data/commands") -- commands and their functions
+    require("libs/sav") --* save library
+    require("libs/funcs") --* functions
+    require("libs/jsonlib") --* json library
+    local data = require("data/commands") --* commands and their functions
+    commands = data.commands
+    enabledcommands = data.enabledcommands
     --OwO u actually read comments ?
     if not(love.filesystem.getInfo("saves")) then
         love.filesystem.createDirectory("saves") -- create the saves dir
     end
+    if not(love.filesystem.getInfo("saves/def_save.txt")) then
+        love.filesystem.newFile("saves/def_save.txt")
+        err = love.filesystem.write("saves/def_save.txt", __VER__)
+        print(err)
+    end
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
     set = read("data/settings.json")
-    logger.datastack:push("\nSettings Config:\n"..love.filesystem.read("data/settings.json"))
+    logger.datastack:push("Settings Config:\n"..love.filesystem.read("data/settings.json").."\n")
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
     if not(skipname) then
         name = false
@@ -77,9 +84,9 @@ function love.load()
     end
     -- ? log some more info
     love_major, love_minnor, love_rev, love_codename = love.getVersion()
-    logger.datastack:push("\nLOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
-    logger.datastack:push("\nMade by Zalan(Zalander)")
-    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt"))
+    logger.datastack:push("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    logger.datastack:push("Made by Zalan(Zalander)\n")
+    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt").."\n")
     logger.write:start()
 end
 function love.update(dt)
@@ -112,13 +119,14 @@ function love.update(dt)
         end
     end
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and __TYPE__ == "DEV" then
-        logger.datastack:push("ERROR INIT BY USER NOT A BUG")
+        logger.datastack:push("ERROR INIT BY USER NOT A BUG\n")
         error("Error init by user")
     end
     if love.keyboard.isDown("escape") then
         love.event.quit(0)
     end
-    if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
+    if (love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") and mode ~= "cmdplt" then
+        logger.log("mode changed to cmdplt")
         mode = "cmdplt"
         save_ar(1)
         ar = {"\b"}
@@ -143,25 +151,7 @@ function love.draw()
             love.graphics.setColor(1, 1, 1)
         end
         if mode == "run" then
-            love.graphics.print("Press CTRL + s to save", 12 * 36, love.graphics.getHeight() - 20)
-        --[[ --? Dont need this code for now
-        elseif mode == "file opn" then
-            love.graphics.print("This is load mode enter filename to be loaded", 12 * 36, love.graphics.getHeight() - 20)
-            tmp = love.filesystem.getDirectoryItems("saves/")
-            love.graphics.print("Files: "..love.filesystem.getAppdataDirectory(), 0, love.graphics.getHeight() / 2)
-            for i = 1, #tmp, 1 do
-                love.graphics.print(tmp[i], ((i - 1)* 12) * #tmp[i], (love.graphics.getHeight() / 2 )+ 12) 
-            end
-            love.graphics.rectangle("line", 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), love.graphics.getHeight() / 2)
-        elseif mode == "file sav" then
-            love.graphics.print("This is save mode enter filene to be saved", 12 * 36, love.graphics.getHeight() - 20)
-            tmp = love.filesystem.getDirectoryItems("saves/")
-            love.graphics.print("Files: "..love.filesystem.getAppdataDirectory(), 0, love.graphics.getHeight() / 2)
-            for i = 1, #tmp, 1 do
-                love.graphics.print(tmp[i], ((i - 1)* 12) * #tmp[i], (love.graphics.getHeight() / 2 )+ 12) 
-            end
-            love.graphics.rectangle("line", 0, love.graphics.getHeight() / 2, love.graphics.getWidth(), love.graphics.getHeight() / 2)
-        --]]
+            love.graphics.print("Press CTRL + s to save", love.graphics.getWidth() - (#"Press CTRL + s to save" * 12), love.graphics.getHeight() - 20)
         elseif mode == "cmdplt" then
             love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 90, (love.graphics.getHeight() / 2) - 50, 180, 100)
             love.graphics.setColor(0, 0, 0)
@@ -179,10 +169,11 @@ function love.draw()
                 end
                 local cmd = split(tmp, " ")
                 tmp = nil
-                if commands[cmd[1]] ~= nil then
-                    commands[cmd[1]](cmd)
+                if commands[cmd[1]] ~= nil and enabledcommands[cmd[1]] == true then
+                    local output = commands[cmd[1]](cmd)
+                    
                 else
-                    love.window.showMessageBox("Error", "Command not found !", "info")
+                    love.window.showMessageBox("Error", "Command not found !", "error")
                 end
             end
             if (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then
@@ -355,19 +346,32 @@ function love.quit()
         love.audio.stop(ping)
         love.audio.play(ping)
         love.timer.sleep(0.01) -- ? wait a little for the sound to play
-        usrchoise = love.window.showMessageBox("Save", "Save ?", {"Yes", "No"})
-        if usrchoise == 1 then
-            logger.datastack:push("Saved ar\n")
-            save_ar(1)
-        else
-            logger.datastack:push("Aborted saving ar\n")
+        if mode ~= "cmdplt" then
+            usrchoise = love.window.showMessageBox("Save", "Save ?", {"Yes", "No"})
+            if usrchoise == 1 then
+                logger.datastack:push("Saved ar\n")
+                save_ar(1)
+            else
+                logger.datastack:push("Aborted saving ar\n")
+            end
         end
-        logger.datastack:push("STOP")
+        --logger.datastack:push("STOP")
+        logger.stop()
         logger.write:wait() -- ? wait for the logger to stop
         return false
     else
-        logger.datastack:push("Exit aboorted\n")
+        logger.log("Exit aboorted")
         return true
     end
 end
---* Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
+--[[
+* Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
+! ________  ________  ___       ________  ________   ___       __   ________  ________  _________  ________  ___  __    _______   ________      
+!|\_____  \|\   __  \|\  \     |\   __  \|\   ___  \|\  \     |\  \|\   __  \|\   ____\|\___   ___\\   __  \|\  \|\  \ |\  ___ \ |\   ___  \    
+! \|___/  /\ \  \|\  \ \  \    \ \  \|\  \ \  \\ \  \ \  \    \ \  \ \  \|\  \ \  \___|\|___ \  \_\ \  \|\  \ \  \/  /|\ \   __/|\ \  \\ \  \   
+!     /  / /\ \   __  \ \  \    \ \   __  \ \  \\ \  \ \  \  __\ \  \ \   __  \ \_____  \   \ \  \ \ \   __  \ \   ___  \ \  \_|/_\ \  \\ \  \  
+!    /  /_/__\ \  \ \  \ \  \____\ \  \ \  \ \  \\ \  \ \  \|\__\_\  \ \  \ \  \|____|\  \   \ \  \ \ \  \ \  \ \  \\ \  \ \  \_|\ \ \  \\ \  \ 
+!   |\________\ \__\ \__\ \_______\ \__\ \__\ \__\\ \__\ \____________\ \__\ \__\____\_\  \   \ \__\ \ \__\ \__\ \__\\ \__\ \_______\ \__\\ \__\
+!    \|_______|\|__|\|__|\|_______|\|__|\|__|\|__| \|__|\|____________|\|__|\|__|\_________\   \|__|  \|__|\|__|\|__| \|__|\|_______|\|__| \|__|
+!                                                                                \|_________|                                                    
+--]]
