@@ -6,13 +6,13 @@ local files = { --? list/array of files
     -- /libs dir
     "libs/sav.lua",
     "libs/funcs.lua",
-    "libs/jsonlib.lua",
     -- /data dir
     "data/icon.png",
     "data/name.png",
     "data/settings.json",
     "data/logo.txt",
     "data/sounds/ping.mp3",
+    "/data/commands.lua",
     -- /html dir
     "html/index.html",
     "html/images/love.ico",

@@ -14,7 +14,6 @@ function love.load()
     logger = require("libs/logger")
     require("libs/sav") --* save library
     require("libs/funcs") --* functions
-    require("libs/jsonlib") --* json library
     local data = require("data/commands") --* commands and their functions
     commands = data.commands
     enabledcommands = data.enabledcommands
@@ -29,7 +28,6 @@ function love.load()
     end
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
-    set = read("data/settings.json")
     logger.datastack:push("Settings Config:\n"..love.filesystem.read("data/settings.json").."\n")
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
     if not(skipname) then
@@ -100,16 +98,6 @@ function love.update(dt)
         if (getnewlines(ar, 1) + 3) * 14 - math.abs(y) > love.graphics.getHeight() then
             y = y - 12
         end
-        if set[6] == "true" then
-            tmp = 0
-            for i = 1, #ar, 1 do
-                if ar[i] == "\n" then
-                    tmp = 0
-                else
-                    tmp = tmp + 1
-                end
-            end
-        end
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
             ar[#ar] = nil
             --print("Saved "..os.time())
@@ -171,7 +159,12 @@ function love.draw()
                 tmp = nil
                 if commands[cmd[1]] ~= nil and enabledcommands[cmd[1]] == true then
                     local output = commands[cmd[1]](cmd)
-                    
+                    if output.exitcode ~= 0 then
+                        if output.message == nil then
+                            output.message = "N/A"
+                        end
+                        love.window.showMessageBox("Command exited unsuccessfully", [["]]..cmd[1]..[["]].." ended with exit code "..output.exitcode.."\n command output message: "..output.message)
+                    end
                 else
                     love.window.showMessageBox("Error", "Command not found !", "error")
                 end
@@ -366,12 +359,12 @@ function love.quit()
 end
 --[[
 * Made by Zalan(Zalander) aka zalanwastaken with LÖVE and some 🎔
-! ________  ________  ___       ________  ________   ___       __   ________  ________  _________  ________  ___  __    _______   ________      
+! ________  ________  ___       ________  ________   ___       __   ________  ________  _________  ________  ___  __    _______   ________   
 !|\_____  \|\   __  \|\  \     |\   __  \|\   ___  \|\  \     |\  \|\   __  \|\   ____\|\___   ___\\   __  \|\  \|\  \ |\  ___ \ |\   ___  \    
 ! \|___/  /\ \  \|\  \ \  \    \ \  \|\  \ \  \\ \  \ \  \    \ \  \ \  \|\  \ \  \___|\|___ \  \_\ \  \|\  \ \  \/  /|\ \   __/|\ \  \\ \  \   
 !     /  / /\ \   __  \ \  \    \ \   __  \ \  \\ \  \ \  \  __\ \  \ \   __  \ \_____  \   \ \  \ \ \   __  \ \   ___  \ \  \_|/_\ \  \\ \  \  
 !    /  /_/__\ \  \ \  \ \  \____\ \  \ \  \ \  \\ \  \ \  \|\__\_\  \ \  \ \  \|____|\  \   \ \  \ \ \  \ \  \ \  \\ \  \ \  \_|\ \ \  \\ \  \ 
 !   |\________\ \__\ \__\ \_______\ \__\ \__\ \__\\ \__\ \____________\ \__\ \__\____\_\  \   \ \__\ \ \__\ \__\ \__\\ \__\ \_______\ \__\\ \__\
 !    \|_______|\|__|\|__|\|_______|\|__|\|__|\|__| \|__|\|____________|\|__|\|__|\_________\   \|__|  \|__|\|__|\|__| \|__|\|_______|\|__| \|__|
-!                                                                                \|_________|                                                    
+!                                                                                \|_________|
 --]]
