@@ -1,85 +1,26 @@
 print("Starting verification...")
-if not(love.filesystem.getInfo("html")) then
-    if love.filesystem.getInfo("html-template") then
-        local template = "html-template"
-        local html_template = love.filesystem.getDirectoryItems(template)
-        local root = "html"
-        love.filesystem.createDirectory(root)
-        for i = 1, #html_template, 1 do
-            if love.filesystem.isDirectory(template.."/"..html_template[i]) then
-                love.filesystem.createDirectory(root.."/"..html_template[i])
-                local tmp = love.filesystem.getDirectoryItems(template.."/"..html_template[i])
-                for f = 1, #tmp, 1 do
-                    html_template[#html_template + 1] = html_template[i].."/"..tmp[f]
-                end
-                table.remove(html_template, i)
-            end
-        end
-        for i = 1, #html_template, 1 do
-            local tmp = love.filesystem.read(template.."/"..html_template[i])
-            print("Setting up..."..html_template[i])
-            if tmp ~= nil then
-                local success, two = love.filesystem.write(root.."/"..html_template[i], tmp)
-                if success then
-                    print("Succesfully setup..."..html_template[i])
-                else
-                    print(success, two)
-                    error(success.."\n"..two)
-                end
-            else
-                tmp = love.filesystem.read(html_template[i])
-                local success, two = love.filesystem.write(root.."/"..html_template[i], tmp)
-                if success then
-                    print("Succesfully setup..."..html_template[i])
-                else
-                    print(success, two)
-                    error(success.."\n"..two)
-                end
-            end
-        end
-    else
-        error("Html template not found") --* setup a error
+local function replace_slash(input_string)
+    -- Replace all occurrences of '/' with '\'
+    return string.gsub(input_string, "/", "\\")
+end
+if love.filesystem.getInfo("html") then
+    if love.system.getOS():lower() == "windows" then
+        os.execute("rmdir /q /s "..replace_slash(love.filesystem.getAppdataDirectory())..[[\LOVE\typer\html]]) --! OS specific code(windows)
+    elseif love.system.getOS():lower() == "linux" then
+        os.execute("rm -rf "..love.filesystem.getAppdataDirectory().."love/typer/html") --! OS specific code(linux)
     end
 end
-local htmlverifythread = love.thread.newThread([[
-    local roothtml = love.filesystem.getDirectoryItems("html-template")
-    local html = love.filesystem.getDirectoryItems("html")
-    if #roothtml ~= #html then
-        love.filesystem.remove("html")
-        local template = "html-template"
-            local html_template = love.filesystem.getDirectoryItems(template)
-            local root = "html"
-            love.filesystem.createDirectory(root)
-            for i = 1, #html_template, 1 do
-                if love.filesystem.isDirectory(template.."/"..html_template[i]) then
-                    love.filesystem.createDirectory(root.."/"..html_template[i])
-                    local tmp = love.filesystem.getDirectoryItems(template.."/"..html_template[i])
-                    for f = 1, #tmp, 1 do
-                        html_template[#html_template + 1] = html_template[i].."/"..tmp[f]
-                    end
-                    table.remove(html_template, i)
-                end
-            end
-            for i = 1, #html_template, 1 do
-                local tmp = love.filesystem.read(template.."/"..html_template[i])
-                print(html_template[i])
-                if tmp ~= nil then
-                    love.filesystem.write(root.."/"..html_template[i], tmp)
-                else
-                    tmp = love.filesystem.read(html_template[i])
-                    --print(tmp)
-                    local success, two = love.filesystem.write(root.."/"..html_template[i], tmp)
-                    print(success, two)
-                end
-            end
-    end
-]])
---htmlverifythread:start() -- ? In testing
+local files
 if love.filesystem.getInfo("helpers/verify/filelist.lua") then
     files = require("helpers/verify/filelist")
 else
-    error("Unable to fetch filelist") --* setup a error
-    return 1 --? terminate the exicution of this file
+    error("Unable to fetch filelist") --* this is here to not let the user get to the code below as it is in testing
+    local usrchoise = love.window.showMessageBox("Unable to verify files", "Typer was unable to verify files\nWould you like to recrate the filelists from local install ?", {"Exit", "Create new filelist"}, "error")
+    if usrchoise == 1 then
+        error("Unable to fetch filelist") --* error out
+    elseif usrchoise == 2 then
+        --TODO
+    end
 end
 local fnf = {} -- list of files that are not found 
 for i = 1, #files, 1 do -- verify the files here

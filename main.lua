@@ -28,7 +28,6 @@ function love.load()
     end
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
-    logger.datastack:push("Settings Config:\n"..love.filesystem.read("data/settings.json").."\n")
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
     if not(skipname) then
         name = false

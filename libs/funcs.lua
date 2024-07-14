@@ -41,7 +41,7 @@ function save_ar(offset)
     end
     love.filesystem.write("saves/def_save.txt", tmp)
     if logger then
-        logger.datastack:push("ar saved\n")
+        logger.log("ar saved")
     end
 end
 function exportar(filename, data)

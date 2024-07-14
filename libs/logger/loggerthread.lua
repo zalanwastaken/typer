@@ -15,7 +15,7 @@ printlogger("Creating new log file")
 local file = "logs/log_"..os.time()..".log"
 if not(love.filesystem.getInfo(file)) then
     love.filesystem.newFile(file)
-    love.filesystem.write(file, os.date().."\n")
+    love.filesystem.write(file, "LOGGER VER: "..__VER__.."\n")
 end
 --* Clean old log files
 if #love.filesystem.getDirectoryItems("logs") >= 12 then
@@ -35,7 +35,6 @@ if #love.filesystem.getDirectoryItems("logs") >= 12 then
         end
     end
 end
-love.filesystem.write(file, love.filesystem.read(file).."\nLOGGER VER: "..__VER__.."\n")
 --* Main logging loop
 while true do
     local data = datastack:pop()

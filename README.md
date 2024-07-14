@@ -84,6 +84,6 @@ sudo pacman -S git
 3. Add Robust error handling...Doing
 4. Make the first Full-Release...Delayed
 ## NOTES
-* I currently have no plans to make an installer for MACOS.<br>
-* I have yet to determine the Full-Release date
+* I currently have no plans to make an installer for MACOS.
+* The current typer logo is a placeholder and will be replaced soon
 * **Typer runs best with the latest version of LOVE2D(11.5)**
