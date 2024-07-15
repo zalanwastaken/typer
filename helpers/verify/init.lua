@@ -53,13 +53,13 @@ else
     logger.datastack:push("\nFiles verified "..#files.."\n")
     logger.datastack:push("ALL VERIFIED\n")
 end
-logger.datastack:push("\n--------------------")
+logger.datastack:push("--------------------\n")
 if love.filesystem.isFused() then
     logger.datastack:push("\nInstalltion is fused: "..love.filesystem.getSource())
 else
     logger.datastack:push("\nInstalltion is not fused: "..love.filesystem.getSource())
 end
-logger.datastack:push("\n--------------------\nOS:"..love.system.getOS().."\n")
+logger.datastack:push("--------------------\nOS:"..love.system.getOS().."\n")
 print("Verification complete...")
 files = nil
 fnf = nil

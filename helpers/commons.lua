@@ -13,11 +13,10 @@ __TYPE__ = "DEV" --! Type of the build (DEV or FR)
 __LOVEVER__ = 11.5 --! version of LOVE2D
 forceerr = false --? force a error screen in dev mode
 skipname = false --? skip the splash screen
--- ! OS specific code
 if love.system.getOS() == "Windows" then
-    __HTML__ = love.filesystem.getAppdataDirectory().."/LOVE/typer/html" --* HTML dir
+    __HTML__ = love.filesystem.getAppdataDirectory().."/LOVE/typer/html" --! OS specific code(windows)
 else
-    __HTML__ = love.filesystem.getAppdataDirectory().."love/typer/html" --* HTML dir
+    __HTML__ = love.filesystem.getAppdataDirectory().."love/typer/html" --! OS specific code(linux)
 end
 if love.system.getOS() == "OS X" then
     love.window.showMessageBox("Mac os is not supported", "Mac os is not supported\nTyper may not work properly","info")
