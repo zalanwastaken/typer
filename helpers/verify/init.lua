@@ -1,11 +1,7 @@
 print("Starting verification...")
-local function replace_slash(input_string)
-    -- Replace all occurrences of '/' with '\'
-    return string.gsub(input_string, "/", "\\")
-end
 if love.filesystem.getInfo("html") then
     if love.system.getOS():lower() == "windows" then
-        os.execute("rmdir /q /s "..replace_slash(love.filesystem.getAppdataDirectory())..[[\LOVE\typer\html]]) --! OS specific code(windows)
+        os.execute("rmdir /q /s "..string.gsub(love.filesystem.getAppdataDirectory())..[[\LOVE\typer\html]], "/", "\\") --! OS specific code(windows)
     elseif love.system.getOS():lower() == "linux" then
         os.execute("rm -rf "..love.filesystem.getAppdataDirectory().."love/typer/html") --! OS specific code(linux)
     end
@@ -50,16 +46,24 @@ else
     for i = 1, #files, 1 do
         logger.datastack:push(files[i].."...OK\n")
     end
-    logger.datastack:push("\nFiles verified "..#files.."\n")
+    logger.datastack:push("Files verified "..#files.."\n")
     logger.datastack:push("ALL VERIFIED\n")
 end
 logger.datastack:push("--------------------\n")
 if love.filesystem.isFused() then
-    logger.datastack:push("\nInstalltion is fused: "..love.filesystem.getSource())
+    --logger.datastack:push("Installtion is fused: "..love.filesystem.getSource())
+    logger.log("Installtion is fused: "..love.filesystem.getSource())
 else
-    logger.datastack:push("\nInstalltion is not fused: "..love.filesystem.getSource())
+    --logger.datastack:push("Installtion is not fused: "..love.filesystem.getSource())
+    logger.log("Installtion is not fused: "..love.filesystem.getSource())
 end
 logger.datastack:push("--------------------\nOS:"..love.system.getOS().."\n")
+logger.log("System prossor count: "..love.system.getProcessorCount())
+if love.system.getProcessorCount() < 2 and love.system.getProcessorCount() ~= 2 then --? one for logger one for main thread
+    error("Your pc dosent meets Typer system requirments")
+end
 print("Verification complete...")
+--? clean vars
 files = nil
 fnf = nil
+logger = nil

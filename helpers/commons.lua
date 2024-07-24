@@ -2,6 +2,7 @@
 require("love.system") --? manually require love.system as this file is runned before its loded internally
 require("love.window")
 require("helpers/errorhandler") --* custom error handler
+require("love.event")
 --*common vars
 tmp = 0 --* init tmp (tmp is a general use variable)
 ar = {} --* user input array (ar = array)
@@ -18,6 +19,6 @@ if love.system.getOS() == "Windows" then
 else
     __HTML__ = love.filesystem.getAppdataDirectory().."love/typer/html" --! OS specific code(linux)
 end
-if love.system.getOS() == "OS X" then
-    love.window.showMessageBox("Mac os is not supported", "Mac os is not supported\nTyper may not work properly","info")
+if love.system.getOS():lower() == "ox x" then
+    love.window.showMessageBox("Mac os is not supported", "Mac os is not supported\nTyper may not work properly", "info")
 end

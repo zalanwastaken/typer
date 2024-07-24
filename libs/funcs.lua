@@ -73,3 +73,9 @@ function split(input, delimiter)
     end
     return result
 end
+function showMessageBox(title, message, buttonlist, boxtype)
+    local pingsfx = love.audio.newSource("data/sounds/ping.mp3", "static")
+    love.audio.play(pingsfx)
+    love.timer.sleep(0.1)
+    love.window.showMessageBox(title, message, buttonlist, boxtype)
+end

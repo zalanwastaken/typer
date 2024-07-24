@@ -6,23 +6,18 @@ local files = { --? list/array of files
     -- /libs dir
     "libs/sav.lua",
     "libs/funcs.lua",
+    "libs/logger/init.lua",
+    "libs/logger/loggerthread.lua",
     -- /data dir
     "data/icon.png",
     "data/name.png",
     "data/logo.txt",
     "data/sounds/ping.mp3",
-    "/data/commands.lua",
-    --[[
-    -- /html dir
-    "html/index.html",
-    "html/images/love.ico",
-    "html/data/love2d-license.txt",
-    "html/info.html",
-    "html/images/icon.png",
-    "html/help.html",
-    --]]
+    "data/commands.lua",
     -- /helpers dir
     "helpers/commons.lua",
-    "helpers/errorhandler.lua"
+    "helpers/errorhandler.lua",
+    "helpers/verify/init.lua",
+    "helpers/verify/filelist.lua"
 }
 return(files)

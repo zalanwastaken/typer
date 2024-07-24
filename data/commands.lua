@@ -5,7 +5,8 @@ local enabledcommands = {
     ["dev"] = false, --? Dont allow dev mode to be enabled this easily >:D
     ["find"] = false, --? broken,
     ["pls"] = true,
-    ["alias"] = true
+    ["alias"] = true,
+    ["help"] = true
 }
 --* code for commands
 local commands = {
@@ -24,8 +25,20 @@ local commands = {
         end
     end,
     ["exit"] = function(args)
+        local exitcode = 0
         if args[2] == "--typer" then
-            love.event.quit(0)
+            if args[3] == "--force" then
+                function love.quit()
+                    --? instant quit
+                    --! NOTE: saving ar doesent matter as its already saved in the defsave as the cmdplt is loaded
+                    return false
+                end
+                
+                if args[4] ~= nil then
+                    exitcode = tonumber(args[4])
+                end
+            end
+            love.event.quit(exitcode)
         else
             initar("saves/def_save.txt")
             mode = "run"

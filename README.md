@@ -1,4 +1,4 @@
-# ATTENTION !: NEW VERSIONS OF TYPER ARE DEVELOPED UNDER A NEW LICENCE PLEASE CHECK licence.txt !<br>
+# HTML has been moved to [here](https://devzalanwastaken.neocities.org/help-typer)
 # Typer<br>
 **DM me for better name ideas :|**
 ## A text editor made with LOVE2D.<br>
@@ -7,7 +7,7 @@
 1) 100% Open Source and Free 📦
 2) Fast and Lightweight (<1MB) 🔥
 3) Why not ? 🐱
-## Read html/help.html for help :D<br>
+## Visit [here](https://devzalanwastaken.neocities.org/help-typer) for help<br>
 ## How to install
 ### Linux
 **NOTE: 2.0.1-PRE-2 Has a installer for Linux(FOR APT NOT FOR PACMAN)**
