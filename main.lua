@@ -47,21 +47,16 @@ function love.load()
     ping = love.audio.newSource("data/sounds/ping.mp3", "static")
     if __TYPE__ == "DEV" then
         logger.datastack:push("WARNING: This build is configured as DEV !\n")
-        love.audio.play(ping)
-        love.timer.sleep(0.01) -- ? wait for the sound to play
-        tmp = love.window.showMessageBox("Warning", "This build is configured as DEV\nDEV builds are only supposed to be for modders and developers\nContinue?", {"Yes", "No"}, "warning") -- message box
+        tmp = showMessageBox("Warning", "This build is configured as DEV\nDEV builds are only supposed to be for modders and developers\nContinue?", {"Yes", "No"}, "warning")
         if tmp == 2 then
-            function love.quit() -- ? Change the quit function to always quit
-                return false
-            end
-            love.event.quit(0) -- quit if no is pressed
+            forcequit(0)
         end
     end
     for i = 1, #testedos, 1 do
         if testedos[i] == love.system.getOS() then
             break
         elseif i == #testedos then
-            love.window.showMessageBox("Warning", "Typer has not been tested on "..love.system.getOS(), "warning")
+            showMessageBox("Warning", "Typer has not been tested on "..love.system.getOS(), "warning")
         end
     end
     tmp = 0
@@ -196,39 +191,8 @@ function love.draw()
             for i = 1, #files, 1 do
                 files[i] = tonumber(removeCharsKeepNumbers(files[i])) -- * get the file id
             end
-            for i = 1, #files, 1 do
-                if files[i] == nil then
-                    print("BAD FILE IN LOGS")
-                    logger.datastack:push("STOP")
-                    logger.write:wait()
-                    local tmp = love.filesystem.getDirectoryItems("logs")
-                    for f = 1, #tmp, 1 do
-                        love.filesystem.remove("logs/"..tmp[f])
-                    end
-                    logger.datastack:push("BAD FILE IN LOGS\n")
-                    logger.datastack:push("LOG DATA LOST !\n")
-                    logger.datastack:push("REMOVED LOG FILES:\n")
-                    local formatstring = ""
-                    for i = 1, #tmp, 1 do
-                        formatstring = formatstring..tmp[i].."\n"
-                    end
-                    logger.datastack:push(formatstring)
-                    logger.write:start()
-                    love.timer.sleep(1)
-                    files = love.filesystem.getInfo("logs")
-                    for f = 1, #files, 1 do
-                        files[f] = tonumber(removeCharsKeepNumbers(files[f])) -- * get the file id
-                    end
-                    function love.quit() -- ? setup quit for love.event.quit("restart") to immedieatly restart
-                        return false
-                    end
-                    logger.datastack:push("Restarting LOVE\n")
-                    logger.datastack:push("STOP")
-                    logger.write:wait()
-                    love.event.quit("restart")
-                    return 1
-                    --break
-                end
+            if unpack(files) == nil then
+                return
             end
             local filedata = love.filesystem.read("logs/log_"..tostring(math.max(unpack(files)))..".log")
             if (gettnewlinesstring(filedata) + 3) * 18 - math.abs(y) > love.graphics.getHeight() then
@@ -329,16 +293,11 @@ function love.textinput(key) -- add the typed letters to ar while ignoring the m
 end
 function love.quit()
     logger.datastack:push("Exit init\n")
-    love.audio.play(ping)
-    love.timer.sleep(0.01) -- ? wait a little for the sound to play
-    local usrchoise = love.window.showMessageBox("Exit", "Exit ?", {"Yes", "No"})
+    local usrchoise = showMessageBox("Exit", "Exit ?", {"Yes", "No"})
     if usrchoise == 1 then
         logger.datastack:push("Exited\n")
-        love.audio.stop(ping)
-        love.audio.play(ping)
-        love.timer.sleep(0.01) -- ? wait a little for the sound to play
         if mode ~= "cmdplt" then
-            usrchoise = love.window.showMessageBox("Save", "Save ?", {"Yes", "No"})
+            usrchoise = showMessageBox("Save", "Save ? ", {"Yes", "No"})
             if usrchoise == 1 then
                 logger.datastack:push("Saved ar\n")
                 save_ar(1)
@@ -346,9 +305,7 @@ function love.quit()
                 logger.datastack:push("Aborted saving ar\n")
             end
         end
-        --logger.datastack:push("STOP")
         logger.stop()
-        logger.write:wait() -- ? wait for the logger to stop
         return false
     else
         logger.log("Exit aboorted")

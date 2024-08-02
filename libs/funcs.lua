@@ -13,13 +13,8 @@ function getnewlines(array, offset)
     return tmp[2]
 end
 function gettnewlinesstring(str)
-    -- Use string.gsub() to replace all occurrences of '\n' with an empty string
     local modifiedStr, count = str:gsub("\n", "")
-
-    -- Count the number of occurrences by comparing the lengths of the original and modified strings
     local newlineCount = #str - #modifiedStr
-
-    -- Return the count of newline characters
     return newlineCount
 end
 function initar(file, add)
@@ -44,6 +39,7 @@ function save_ar(offset)
         logger.log("ar saved")
     end
 end
+--[[ --? Not needed as the new filesaving saves the saves as .txt with \n chars
 function exportar(filename, data)
     local tmp = ""
     ar = {}
@@ -61,6 +57,7 @@ function exportar(filename, data)
     end
     logger.datastack:push("ar saved to "..filename.."\n") -- ! logger.lua required for this
 end
+--]]
 function removeCharsKeepNumbers(str)
     local result = str:gsub("[^%d]+", "")
     return result
@@ -77,5 +74,22 @@ function showMessageBox(title, message, buttonlist, boxtype)
     local pingsfx = love.audio.newSource("data/sounds/ping.mp3", "static")
     love.audio.play(pingsfx)
     love.timer.sleep(0.1)
-    love.window.showMessageBox(title, message, buttonlist, boxtype)
+    return(love.window.showMessageBox(title, message, buttonlist, boxtype))
+end
+function forcequit(exitcode, savearbool)
+    if savearbool == nil then
+        savearbool = false
+    end
+    if exitcode == nil then
+        exitcode = 0
+    end
+    function love.quit()
+        logger.log("Force exit init")
+        if savearbool then
+            save_ar(1)
+        end
+        logger.stop()
+        return false
+    end
+    love.event.quit(exitcode)
 end

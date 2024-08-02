@@ -15,6 +15,7 @@ local logger = {
     end,
     stop = function()
         logger.datastack:push("STOP")
+        logger.write:wait()
     end
 }
 return(logger)
