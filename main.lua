@@ -27,6 +27,7 @@ function love.load()
         print(err)
     end
     initar("saves/def_save.txt", true) -- init the ar variable (load saves/def_save.txt into ar)
+    sel = #ar
     love.keyboard.setKeyRepeat(true) -- set repeat to true so user can press and hold
     love.window.setIcon(love.image.newImageData("data/icon.png")) -- set the image and create the image data
     if not(skipname) then
@@ -213,6 +214,19 @@ function love.draw()
 end
 function love.keypressed(key)
     if not(#ar-1 < 0 or #ar-1 == 0) then
+        --table.remove(ar, sel)
+        if key == "left" then
+            local lastchar = ar[sel-1]
+            sel = sel - 1
+            ar[sel+1] = lastchar
+            ar[sel] = "\b"
+        end
+        if key == "right" and sel ~= #ar then
+            local lastchar = ar[sel+1]
+            sel = sel + 1
+            ar[sel-1] = lastchar
+            ar[sel] = "\b"
+        end
         logger.datastack:push("Key pressed "..key.."\n")
         tmp = 0
         for i = 1, #ar, 1 do
@@ -227,7 +241,9 @@ function love.keypressed(key)
                 x = x - 314 * love.timer.getDelta()
             end
         end
-        ar[#ar] = nil
+        --ar[#ar] = nil
+        --table.remove(ar, sel)
+        --sel = sel - 1
         if key == "escape" and mode ~= "run" then
             mode = "run"
             ar = {}
@@ -265,7 +281,7 @@ function love.keypressed(key)
                     end
                 end
                 if not(y == 0) then
-                    if ar[#ar] == "\n" then
+                    if ar[#ar] == "\n" then 
                         if y > 0 then
                             y = 0
                         else
@@ -274,35 +290,64 @@ function love.keypressed(key)
                     end
                 end
             end
-            ar[#ar] = nil
+            --ar[#ar] = nil
+            --table.remove(ar, sel)
+            --sel = sel - 1
+            ar[sel-1] = "\b"
+            ar[sel] = nil
+            sel = sel - 1
         end
-        ar[#ar + 1] = "\b"
+        --ar[#ar + 1] = "\b"
+        --table.insert(ar, sel, "\b")
     elseif key == "return" then
+        table.remove(ar, sel)
+        table.insert(ar, sel, "\n")
+        table.insert(ar, sel, "\b")
+        sel = sel + 1
+        --[[
         ar[#ar] = nil
         ar[#ar + 1] = "\n"
         ar[#ar + 1] = "\b"
+        --]]
     else
         logger.datastack:push("keypressed check skipped ar too short\n")
     end
 end
 function love.textinput(key) -- add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
+    --[[
     ar[#ar] = nil
     ar[#ar + 1] = key
     ar[#ar + 1] = "\b"
     logger.datastack:push("Placed "..key.." in ar\n")
+    --]]
+    ar[sel] = nil
+    --[[
+    if sel == #ar then
+        ar[sel] = key
+        sel = sel + 1
+        ar[sel] = "\b"
+    else
+        table.insert(ar, sel, key)
+        sel = sel + 1
+        table.insert(ar, sel, "\b")
+    end
+    --]]
+    table.insert(ar, sel, key)
+    sel = sel + 1
+    table.insert(ar, sel, "\b")
 end
 function love.quit()
-    logger.datastack:push("Exit init\n")
+    logger.log("Exit init")
     local usrchoise = showMessageBox("Exit", "Exit ?", {"Yes", "No"})
     if usrchoise == 1 then
-        logger.datastack:push("Exited\n")
+        logger.log("Exited")
         if mode ~= "cmdplt" then
             usrchoise = showMessageBox("Save", "Save ? ", {"Yes", "No"})
             if usrchoise == 1 then
-                logger.datastack:push("Saved ar\n")
+                logger.log("Saved ar")
                 save_ar(1)
             else
-                logger.datastack:push("Aborted saving ar\n")
+                logger.log("Aborted saving ar")
             end
         end
         logger.stop()

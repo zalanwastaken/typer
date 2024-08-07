@@ -1,5 +1,4 @@
 if love.filesystem.getInfo("helpers/commons.lua") then
-    -- ? not found error will be caught by helpers/verify.lua
     require("helpers/commons")
 else
     print("ERROR: helpers/commons.lua not found !")

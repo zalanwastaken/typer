@@ -19,6 +19,3 @@ if love.system.getOS() == "Windows" then
 else
     __HTML__ = love.filesystem.getAppdataDirectory().."love/typer/html" --! OS specific code(linux)
 end
-if love.system.getOS():lower() == "ox x" then
-    love.window.showMessageBox("Mac os is not supported", "Mac os is not supported\nTyper may not work properly", "info")
-end
