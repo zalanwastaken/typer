@@ -213,19 +213,20 @@ function love.draw()
     end
 end
 function love.keypressed(key)
-    if not(#ar-1 < 0 or #ar-1 == 0) then
-        --table.remove(ar, sel)
+    if not(#ar-1 == 0) then
         if key == "left" then
             local lastchar = ar[sel-1]
             sel = sel - 1
             ar[sel+1] = lastchar
             ar[sel] = "\b"
+            logger.log("sel changed to: "..sel)
         end
         if key == "right" and sel ~= #ar then
             local lastchar = ar[sel+1]
             sel = sel + 1
             ar[sel-1] = lastchar
             ar[sel] = "\b"
+            logger.log("sel changed to: "..sel)
         end
         logger.datastack:push("Key pressed "..key.."\n")
         tmp = 0
@@ -241,9 +242,6 @@ function love.keypressed(key)
                 x = x - 314 * love.timer.getDelta()
             end
         end
-        --ar[#ar] = nil
-        --table.remove(ar, sel)
-        --sel = sel - 1
         if key == "escape" and mode ~= "run" then
             mode = "run"
             ar = {}
@@ -251,16 +249,17 @@ function love.keypressed(key)
         end
         if key == "return" or key == "down" then
             if mode == "run" then
-                ar[#ar + 1] = "\n"
-                x = 0
+                table.insert(ar, sel, "\n")
+                sel = sel + 1
             end
         end
         if key == "backspace" or key == "up" then
-            logger.datastack:push(ar[#ar].." Removed from ar\n")
+            logger.datastack:push(ar[sel].." Removed from ar\n")
+            table.remove(ar, sel-1)
+            sel = sel - 1
             if mode == "run" then
-                --save_ar(0)
                 tmp = 0
-                for i = 1, #ar, 1 do
+                for i = 1, sel, 1 do
                     if ar[i] ~= "\n" then
                         tmp = tmp + 1
                     else
@@ -281,7 +280,7 @@ function love.keypressed(key)
                     end
                 end
                 if not(y == 0) then
-                    if ar[#ar] == "\n" then 
+                    if ar[sel] == "\n" then 
                         if y > 0 then
                             y = 0
                         else
@@ -290,51 +289,16 @@ function love.keypressed(key)
                     end
                 end
             end
-            --ar[#ar] = nil
-            --table.remove(ar, sel)
-            --sel = sel - 1
-            ar[sel-1] = "\b"
-            ar[sel] = nil
-            sel = sel - 1
         end
-        --ar[#ar + 1] = "\b"
-        --table.insert(ar, sel, "\b")
     elseif key == "return" then
-        table.remove(ar, sel)
-        table.insert(ar, sel, "\n")
-        table.insert(ar, sel, "\b")
-        sel = sel + 1
-        --[[
-        ar[#ar] = nil
-        ar[#ar + 1] = "\n"
-        ar[#ar + 1] = "\b"
-        --]]
     else
         logger.datastack:push("keypressed check skipped ar too short\n")
     end
 end
 function love.textinput(key) -- add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
-    --[[
-    ar[#ar] = nil
-    ar[#ar + 1] = key
-    ar[#ar + 1] = "\b"
-    logger.datastack:push("Placed "..key.." in ar\n")
-    --]]
-    ar[sel] = nil
-    --[[
-    if sel == #ar then
-        ar[sel] = key
-        sel = sel + 1
-        ar[sel] = "\b"
-    else
-        table.insert(ar, sel, key)
-        sel = sel + 1
-        table.insert(ar, sel, "\b")
-    end
-    --]]
     table.insert(ar, sel, key)
     sel = sel + 1
-    table.insert(ar, sel, "\b")
+    logger.log(key.." added to ar")
 end
 function love.quit()
     logger.log("Exit init")
