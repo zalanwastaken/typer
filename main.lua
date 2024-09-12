@@ -75,6 +75,7 @@ function love.load()
             x = x - 314 * love.timer.getDelta()
         end
     end
+    olddebuginfo = not(debuginfo)
     -- ? log some more info
     love_major, love_minnor, love_rev, love_codename = love.getVersion()
     logger.datastack:push("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
@@ -84,10 +85,13 @@ function love.load()
 end
 function love.update(dt)
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
-        debuginfo = true
-    end
-    if love.keyboard.isDown("lctrl") and love.keyboard.isDown("f") and __TYPE__ == "DEV" then
-        debuginfo = false
+        if olddebuginfo == debuginfo then
+            debuginfo = not(debuginfo)
+            logger.log("debug info toggled")
+        end
+    elseif debuginfo ~= olddebuginfo then
+        olddebuginfo = debuginfo
+        logger.log("olddebug info var updated")
     end
     if mode == "run" then
         if (getnewlines(ar, 1) + 3) * 14 - math.abs(y) > love.graphics.getHeight() then
@@ -95,13 +99,13 @@ function love.update(dt)
         end
         if love.keyboard.isDown("lctrl") and love.keyboard.isDown("s") then
             ar[#ar] = nil
-            logger.datastack:push("User saved ar\n")
+            logger.log("User saved ar")
             save_ar(0)
             ar[#ar + 1] = "\b"
         end
     end
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("e") and __TYPE__ == "DEV" then
-        logger.datastack:push("ERROR INIT BY USER NOT A BUG\n")
+        logger.log("ERROR INIT BY USER NOT A BUG !")
         error("Error init by user")
     end
     if love.keyboard.isDown("escape") then
@@ -112,6 +116,7 @@ function love.update(dt)
         mode = "cmdplt"
         save_ar(1)
         ar = {"\b"}
+        sel = #ar
     end
 end
 function love.draw()
@@ -139,7 +144,7 @@ function love.draw()
             love.graphics.setColor(0, 0, 0)
             love.graphics.rectangle("fill", (love.graphics.getWidth() / 2) - 80, (love.graphics.getHeight() / 2) - 40, 160, 80)
             love.graphics.setColor(1, 1, 1)
-            if #ar <= 1 then
+            if sel <= 1 then
                 love.graphics.print("Command palette", (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
             else
                 love.graphics.print(ar, (love.graphics.getWidth() / 2) - 77, (love.graphics.getHeight() / 2) - 30)
@@ -157,10 +162,10 @@ function love.draw()
                         if output.message == nil then
                             output.message = "N/A"
                         end
-                        love.window.showMessageBox("Command exited unsuccessfully", [["]]..cmd[1]..[["]].." ended with exit code "..output.exitcode.."\n command output message: "..output.message)
+                        showMessageBox("Command exited unsuccessfully", [["]]..cmd[1]..[["]].." ended with exit code "..output.exitcode.."\n command output message: "..output.message, "error")
                     end
                 else
-                    love.window.showMessageBox("Error", "Command not found !", "error")
+                    showMessageBox("Error", "Command not found !", "error")
                 end
             end
             if (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt")) and (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) and love.keyboard.isDown("c") then

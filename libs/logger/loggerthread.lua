@@ -51,7 +51,7 @@ while true do
             printlogger("Warning: file is large, read write speed reduced")
         end
     elseif data == "STOP" then
-        love.filesystem.write(file, love.filesystem.read(file).."\nLogger stopped")
+        love.filesystem.write(file, love.filesystem.read(file).."\n["..os.date().."] Logger stopped...")
         printlogger("Logger stopped...")
         break
     else

@@ -6,11 +6,18 @@ local enabledcommands = {
     ["find"] = false, --? broken,
     ["pls"] = true,
     ["alias"] = true,
-    ["help"] = true
+    ["help"] = true,
+    ["install"] = false --? Not implimented yet
 }
 --* code for commands
 local commands = {
     ["open"] = function(args)
+        if args[2] == nil then
+            return({
+                exitcode = 1,
+                message = "No file name supplied"
+            })
+        end
         if love.filesystem.getInfo("saves/"..args[2]) then
             initar("saves/"..args[2])
             mode = "run"
@@ -32,8 +39,7 @@ local commands = {
                     --? instant quit
                     --! NOTE: saving ar doesent matter as its already saved in the defsave as the cmdplt is loaded
                     return false
-                end
-                
+                end                
                 if args[4] ~= nil then
                     exitcode = tonumber(args[4])
                 end
@@ -122,6 +128,12 @@ local commands = {
         love.timer.sleep(1)
         return({
             exitcode = 0
+        })
+    end,
+    ["install"] = function(args)
+        return({
+            exitcode = 2,
+            message = "Not impliemnted... yet !"
         })
     end
 }
