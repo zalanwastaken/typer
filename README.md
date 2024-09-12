@@ -81,7 +81,7 @@ sudo pacman -S git
 ## TODO
 1. Make a installer for windows...Pending
 2. Fix some bugs...Doing
-3. Add Robust error handling...Doing
+3. Add Robust error handling...Done
 4. Make the first Full-Release...Delayed
 ## NOTES
 * I currently have no plans to make an installer for MACOS.
