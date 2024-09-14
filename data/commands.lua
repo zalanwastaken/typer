@@ -6,12 +6,15 @@ local enabledcommands = {
     ["find"] = false, --? broken,
     ["pls"] = true,
     ["alias"] = true,
+    ["newalias"] = false, --? Still testing
     ["help"] = true,
-    ["install"] = false --? Not implimented yet
+    ["install"] = false, --? Not implimented yet
+    ["new"] = true
 }
 --* code for commands
 local commands = {
     ["open"] = function(args)
+        local json = require("libs/json")
         if args[2] == nil then
             return({
                 exitcode = 1,
@@ -20,6 +23,15 @@ local commands = {
         end
         if love.filesystem.getInfo("saves/"..args[2]) then
             initar("saves/"..args[2])
+            if not(love.filesystem.getInfo("saves/save_data.json")) then
+                love.filesystem.newFile("saves/save_data.json")
+            end
+            local jsondata = json.encode({
+                filename = "saves/"..args[2],
+                top = os.time() --? time of open
+            })
+            logger.log("save_data.json: "..jsondata)
+            love.filesystem.write("saves/save_data.json", jsondata)
             mode = "run"
             return({
                 exitcode = 0
@@ -123,6 +135,24 @@ local commands = {
             })
         end
     end,
+    ["newalias"] = function(args) --? A lot more efficient than the old alias
+        if commands[args[2]] ~= nil then
+            commands[args[3]] = function(args2)
+                return(commands[args[2]](args2))
+            end
+            if args[4] == "--enable" then
+                enabledcommands[args[3]] = true
+            end
+            return({
+                exitcode = 0
+            })
+        else
+            return({
+                exitcode = 1,
+                message = "Command not found"
+            })
+        end
+    end,
     ["help"] = function(args)
         love.system.openURL("https://devzalanwastaken.neocities.org/help-typer")
         love.timer.sleep(1)
@@ -131,9 +161,37 @@ local commands = {
         })
     end,
     ["install"] = function(args)
+        --TODO
         return({
             exitcode = 2,
             message = "Not impliemnted... yet !"
+        })
+    end,
+    ["new"] = function(args)
+        local json = require("libs/json")
+        if not(love.filesystem.getInfo("saves/save_data.json")) then
+            return({
+                exitcode = 1,
+                message = "Unable to find save_data.json for save data"
+            })
+        end
+        local savedata = json.decode(love.filesystem.read("saves/save_data.json"))
+        if not(love.filesystem.getInfo(savedata.filename)) then
+            love.filesystem.newFile(savedata.filename)
+        end
+        love.filesystem.write(savedata.filename, love.filesystem.read("saves/def_save.txt"))
+        love.filesystem.write("saves/def_save.txt", "")
+        local jsondata = json.encode({
+            filename = "saves/def_save.txt",
+            top = savedata.top,
+            tos = os.time()
+        })
+        love.filesystem.write("saves/save_data.json", jsondata)
+        ar = {}
+        initar("saves/def_save.txt", true)
+        mode = "run"
+        return({
+            exitcode = 0
         })
     end
 }
