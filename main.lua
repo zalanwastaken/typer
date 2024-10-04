@@ -1,15 +1,13 @@
 function love.load()
     if love.filesystem.getInfo("helpers/verify") then
-        require("helpers/verify") -- run the verification script
+        require("helpers/verify") --* run the verification script
     else
-        print("error: Unable to verify interigrity") -- if the script is not found print the error to the console
-        if love.filesystem.getInfo("verification_log.log") then 
-            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") -- write the log
-        else
-            love.filesystem.newFile("verification_log.log") -- create the log file if it does not exists
-            love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") -- write the log
+        print("error: Unable to verify interigrity") --? if the script is not found print the error to the console
+        if not(love.filesystem.getInfo("verification_log.log")) then
+            love.filesystem.newFile("verification_log.log") --* create the log file if it does not exists
         end
-        error("We are currently unable to verify interigrity for the safety of your data this programwill now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
+        love.filesystem.write("verification_log.log", os.time().."\nFiles not found:\n"..love.filesystem.getSource().."/helpers/verify.lua") --* write the log
+        error("We are currently unable to verify interigrity for the safety of your data this program will now shutdown. \nYou can try reinstalling the program.\nReinstalling will not affect your data.") -- error out
     end
     logger = require("libs/logger")
     require("libs/sav") --* save library
@@ -47,7 +45,7 @@ function love.load()
     love.graphics.setFont(fnt) -- set the font
     ping = love.audio.newSource("data/sounds/ping.mp3", "static")
     if __TYPE__ == "DEV" then
-        logger.datastack:push("WARNING: This build is configured as DEV !\n")
+        logger.log("WARNING: This build is configured as DEV !\n")
         tmp = showMessageBox("Warning", "This build is configured as DEV\nDEV builds are only supposed to be for modders and developers\nContinue?", {"Yes", "No"}, "warning")
         if tmp == 2 then
             forcequit(0)
@@ -69,19 +67,19 @@ function love.load()
         end
     end
     if tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) then
-        i = 0
+        local i = 0
         while tmp * 12 - math.abs(x * 1.5) > love.graphics.getWidth() + (love.graphics.getWidth() / 4) do
             i = i + 1
             x = x - 314 * love.timer.getDelta()
         end
     end
-    olddebuginfo = not(debuginfo)
+    olddebuginfo = debuginfo
     -- ? log some more info
     love_major, love_minnor, love_rev, love_codename = love.getVersion()
-    logger.datastack:push("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
-    logger.datastack:push("Made by Zalan(Zalander)\n")
-    logger.datastack:push("\n"..love.filesystem.read("data/logo.txt").."\n")
-    logger.write:start()
+    logger.log("VERSION INFO\n".."LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.."\n".."LOVE2D CODENAME: "..love_codename.."\n".."VER: "..__VER__.."\n".."TYPE: "..__TYPE__.."\n")
+    logger.log("Made by Zalanwastaken")
+    logger.log("\n"..love.filesystem.read("data/logo.txt"))
+    logger.start()
 end
 function love.update(dt)
     if love.keyboard.isDown("lctrl") and love.keyboard.isDown("d") and __TYPE__ == "DEV" then
@@ -158,6 +156,12 @@ function love.draw()
                 tmp = nil
                 if commands[cmd[1]] ~= nil and enabledcommands[cmd[1]] == true then
                     local output = commands[cmd[1]](cmd)
+                    if output == nil then
+                        output = {
+                            --? We are going to pretned that the command exited unsecessfully because it failed to return a exit val
+                            exitcode = 1
+                        }
+                    end
                     if output.exitcode ~= 0 then
                         if output.message == nil then
                             output.message = "N/A"
@@ -176,18 +180,22 @@ function love.draw()
         if love.keyboard.isDown("lctrl") and mode == "run" and love.keyboard.isDown("s") then
             love.graphics.print("(saved)", love.graphics.getWidth() - 69, love.graphics.getHeight() - 20)
         end
-        if __TYPE__ == "DEV" and debuginfo then
-            love.graphics.setColor(1, 0, 1)
+        if __TYPE__ == "DEV" and debuginfo == true then
+            love.graphics.setColor(1, 0, 0)
             love.graphics.print("DEBUG INFO", 0, 0)
+            love.graphics.setColor(0, 0, 1)
             love.graphics.print("Array length: "..#ar, 0, 12)
             love.graphics.print("X & Y: "..x.." "..y, 0, 24)
             love.graphics.print("LOVE2D VER: "..love_major.."."..love_minnor.."."..love_rev.." "..love_codename, 0, 36)
             love.graphics.print("TYPER VER: "..__VER__.." "..__TYPE__.." Build", 0, 48)
+            love.graphics.setColor(0, 1, 0)
+            love.graphics.print("FPS: "..love.timer.getFPS(), 0, 60)
+            love.graphics.print("DT: "..math.floor(love.timer.getDelta()*10000)/10000, 0, 72)
             love.graphics.setColor(1, 1, 1)
         end
     else
         love.graphics.setColor(1, 1, 1, opacity)
-        opacity = opacity - 3.14 * love.timer.getDelta() -- 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
+        opacity = opacity - 3.14 * love.timer.getDelta() --* 3.14 gives the smoothest transition idk why ¯\_(ツ)_/¯
         timer = timer + 10 * love.timer.getDelta()
         love.graphics.draw(name_image, (love.graphics.getWidth()) - name_image:getWidth(), (love.graphics.getHeight()) - name_image:getHeight())
         if __TYPE__ == "DEV" then
@@ -210,7 +218,7 @@ function love.draw()
         end
         if timer > 15 or (love.keyboard.isDown("space") and name == false) then
             name = true
-            -- clean variables that are no longer needed 
+            --? clean variables that are no longer needed 
             opacity = nil
             timer = nil
             name_image = nil
@@ -233,7 +241,6 @@ function love.keypressed(key)
             ar[sel] = "\b"
             logger.log("sel changed to: "..sel)
         end
-        logger.datastack:push("Key pressed "..key.."\n")
         tmp = 0
         for i = 1, #ar, 1 do
             if ar[i] ~= "\n" then
@@ -259,7 +266,6 @@ function love.keypressed(key)
             end
         end
         if key == "backspace" or key == "up" then
-            logger.datastack:push(ar[sel].." Removed from ar\n")
             table.remove(ar, sel-1)
             sel = sel - 1
             if mode == "run" then
@@ -295,15 +301,16 @@ function love.keypressed(key)
                 end
             end
         end
-    elseif key == "return" then
+    elseif key == "return" or key == "down" then
+        table.insert(ar, sel, "\n")
+        sel = sel + 1
     else
-        logger.datastack:push("keypressed check skipped ar too short\n")
+        logger.log("keypressed check skipped ar too short")
     end
 end
-function love.textinput(key) -- add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
+function love.textinput(key) --* add the typed letters to ar while ignoring the modifier keys (exept Caps lock and shift and some others too)
     table.insert(ar, sel, key)
     sel = sel + 1
-    logger.log(key.." added to ar")
 end
 function love.quit()
     logger.log("Exit init")
@@ -318,8 +325,11 @@ function love.quit()
             else
                 logger.log("Aborted saving ar")
             end
+        else
+            logger.log("Did not save ar because of active cmdplt")
         end
-        logger.stop()
+        logger.datastack:push("STOP")
+        logger.write:wait()
         return false
     else
         logger.log("Exit aboorted")

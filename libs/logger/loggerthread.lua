@@ -1,15 +1,15 @@
 require("love.timer")
 require("libs/funcs")
+require("helpers/commons") --? for __TYPE__ var
 local function printlogger(str)
     print("[THREAD/LOGGER]["..os.time().."] "..str)
 end
 printlogger("Starting logger...")
-require("helpers/commons") -- for __TYPE__ var
 local __VER__ = [[TYPER-NO-FR-LOGGER]]
+local datastack = love.thread.getChannel("datalogger") --? the datastack to get data from the main thread
 if not(love.filesystem.getInfo("logs")) then
     love.filesystem.createDirectory("logs")
 end
-local datastack = love.thread.getChannel("datalogger")
 --* Create the log file
 printlogger("Creating new log file")
 local file = "logs/log_"..os.time()..".log"
@@ -35,6 +35,9 @@ if #love.filesystem.getDirectoryItems("logs") >= 12 then
         end
     end
 end
+if love.filesystem.getInfo("logs/verification_log.log") then
+    love.filesystem.remove("logs/verification_log.log")
+end
 --* Main logging loop
 while true do
     local data = datastack:pop()
@@ -51,10 +54,10 @@ while true do
             printlogger("Warning: file is large, read write speed reduced")
         end
     elseif data == "STOP" then
-        love.filesystem.write(file, love.filesystem.read(file).."\n["..os.date().."] Logger stopped...")
-        printlogger("Logger stopped...")
         break
     else
         love.timer.sleep(0.1)
     end
 end
+love.filesystem.write(file, love.filesystem.read(file).."\n["..os.date().."] Logger stopped...")
+printlogger("Logger stopped...")

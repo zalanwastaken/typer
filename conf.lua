@@ -7,6 +7,9 @@ end
 -- * config func
 function love.conf(t)
     t.version = __LOVEVER__ --* set the love2d version
+    if __TYPE__ == nil then
+        error("TYPE not specified")
+    end
     if __TYPE__== "DEV" then
         t.window.title = "DEV BUILD "..__VER__
         t.console = true --* set the console

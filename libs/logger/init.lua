@@ -6,16 +6,19 @@ local logger = {
     write = love.thread.newThread("libs/logger/loggerthread.lua"),
     --* log function
     log = function(str)
-        --logger.datastack:push(str.."\n")
         local loggerdata = love.thread.getChannel("datalogger")
         if type(str):lower() ~= "string" then
             error("Log can only push strings !")
+        else
+            loggerdata:push(str.."\n")
         end
-        loggerdata:push(str.."\n")
     end,
     stop = function()
         logger.datastack:push("STOP")
         logger.write:wait()
+    end,
+    start = function()
+        logger.write:start()
     end
 }
 return(logger)

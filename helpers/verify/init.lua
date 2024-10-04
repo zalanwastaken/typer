@@ -1,9 +1,12 @@
+--! THE VERIFICATION SYSTEM FOR THE FILES WILL BE WRITTEN
 print("Starting verification...")
 if love.filesystem.getInfo("html") then
     if love.system.getOS():lower() == "windows" then
         os.execute("rmdir /q /s "..string.gsub(love.filesystem.getAppdataDirectory())..[[\LOVE\typer\html]], "/", "\\") --! OS specific code(windows)
     elseif love.system.getOS():lower() == "linux" then
         os.execute("rm -rf "..love.filesystem.getAppdataDirectory().."love/typer/html") --! OS specific code(linux)
+    elseif love.system.getOS():lower() == "macos" then
+        print("Too bad !")
     end
 end
 local files
@@ -16,6 +19,7 @@ else
         error("Unable to fetch filelist") --* error out
     elseif usrchoise == 2 then
         --TODO
+        logger.log("User accsed unimplimented feature")
     end
 end
 local fnf = {} -- list of files that are not found 
@@ -51,10 +55,8 @@ else
 end
 logger.datastack:push("--------------------\n")
 if love.filesystem.isFused() then
-    --logger.datastack:push("Installtion is fused: "..love.filesystem.getSource())
     logger.log("Installtion is fused: "..love.filesystem.getSource())
 else
-    --logger.datastack:push("Installtion is not fused: "..love.filesystem.getSource())
     logger.log("Installtion is not fused: "..love.filesystem.getSource())
 end
 logger.datastack:push("--------------------\nOS:"..love.system.getOS().."\n")

@@ -193,6 +193,10 @@ local commands = {
         return({
             exitcode = 0
         })
+    end,
+    ["testerr"] = function(args)
+        logger.log("Error caused by testerr")
+        error(args[2] or "No message provided")
     end
 }
 return({commands = commands, enabledcommands = enabledcommands}) --? Looks stupid I know but... it works so dont touch it !
