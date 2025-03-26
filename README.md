@@ -1,4 +1,4 @@
-# HTML has been moved to [here](https://devzalanwastaken.neocities.org/help-typer)
+# Typer is being re-writen from scratch
 # Typer<br>
 **DM me for better name ideas :|**
 ## A text editor made with LOVE2D.<br>
